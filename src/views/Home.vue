@@ -47,6 +47,7 @@ export default {
   width: 80%;
   margin: auto;
   height: calc(100vh - 70px);
+  overflow: hidden;
 }
 
 .wave {

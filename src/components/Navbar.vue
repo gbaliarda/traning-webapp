@@ -1,19 +1,51 @@
 <template>
-  <nav>
-    <router-link to="/" class="logo">traning</router-link>
-    <div class="links">
-      <router-link to="/">Inicio</router-link>
-      <a href="#herramientas">Herramientas</a>
-      <button class="register">Registrarse</button>
-      <button>Acceder</button>
-    </div>
-  </nav>
+  <div>
+    <nav>
+      <router-link to="/" class="logo">traning</router-link>
+      <div class="links">
+        <router-link to="/">Inicio</router-link>
+        <a href="#herramientas">Herramientas</a>
+        <button class="register" id="register">Registrarse</button>
+        <button id="loginBtn">Acceder</button>
+      </div>
+    </nav>
+    <Signup />
+    <Login />
+  </div>
 </template>
 
 <script>
+import Signup from './Signup.vue'
+import Login from './Login.vue'
+
+
 export default {
   name: "Navbar",
+  components: {
+    Signup,
+    Login
+  },
+  mounted: function() {
+    document.getElementById("register").addEventListener("click", function() {
+      document.querySelector(".signup").style.display = "flex";
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", function() {
+      document.querySelector(".login").style.display = "flex";
+    });
+
+    document.getElementById("loginToRegister").addEventListener("click", function() {
+      document.querySelector(".signup").style.display = "flex";
+      document.querySelector(".login").style.display = "none";
+    });
+
+    document.getElementById("registerToLogin").addEventListener("click", function() {
+      document.querySelector(".signup").style.display = "none";
+      document.querySelector(".login").style.display = "flex";
+    });
+  }
 };
+
 </script>
 
 <style scoped lang="scss">
@@ -39,7 +71,13 @@ export default {
         padding: 0.7em;
         border-radius: .6em;
         color: #fff;
+        text-transform: none;
+        font-weight: 400;
+        box-shadow: none;
+        letter-spacing: inherit;
+        font-size: inherit;
       }
     }
   }
+
 </style>

@@ -7,7 +7,9 @@
     <div class="rutinas">
       <RoutineCard titulo="Piernas" duracion="30 minutos" dificultad="avanzada" />
       <RoutineCard titulo="Brazos" duracion="30 minutos" dificultad="avanzada" />
-      <AddButton />
+      <router-link to="/crear-rutina">
+        <AddButton />
+      </router-link>
     </div>
   </div>
 </template>

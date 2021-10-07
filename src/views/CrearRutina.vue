@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <div class="title">
-      <v-icon class="icon" size="30">mdi-arrow-left</v-icon>
+      <router-link to="/rutinas">
+        <v-icon class="icon" size="30">mdi-arrow-left</v-icon>
+      </router-link>
       <h1>Crear rutina</h1>
     </div>
     <div class="inputs">
@@ -17,14 +19,17 @@
       <div class="input">
         <p>Duración</p>
         <div class="duration-box">
-          <input type="number">
+          <input type="number" min="0">
           <!-- Reemplazar por select -->
           <input type="text">
         </div>
       </div>
     </div>
     <p>Ejercicios</p>
-    <CreateCard titulo="Sentadillas" />
+    <div class="ejercicios">
+      <CreateCard titulo="Sentadillas" />
+      <CreateCard titulo="Estocadas" />
+    </div>
     <Button text="Guardar" />
   </div>
 </template>
@@ -47,6 +52,11 @@ export default {
     width: 80%;
     margin: auto;
     margin-top: 4em;
+
+    .ejercicios {
+      display: flex;
+      flex-wrap: wrap;
+    }
 
     p {
       font-size: 1.4em;

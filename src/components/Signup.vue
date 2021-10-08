@@ -5,12 +5,12 @@
       <h2 class="title">Registrarse</h2>
       <hr>
 
-      <form class="formContent">
+      <div class="formContent">
         <div class="namesDiv">
-          <input type="text" placeholder="nombre..." class="input nameInput" />
-          <input type="text" placeholder="apellido..." class="input nameInput" />
+          <input type="text" placeholder="nombre..." class="input nameInput" id="signupName"/>
+          <input type="text" placeholder="apellido..." class="input nameInput" id="signupSurname"/>
         </div>
-        <input type="text" placeholder="email..." class="input" />
+        <input type="email" placeholder="email..." class="input" id="signupEmail"/>
         
         <div class="passwordBox">
           <input type="password" placeholder="contraseña..." class="input" id="firstPassword" />
@@ -29,10 +29,10 @@
         </div>
         <span class="restrictionText">Al menos 8 caracteres combinando letras y números</span>
 
-        <input type="button" value="Registrarse" class="registerBtn" />
+        <input type="button" value="Registrarse" @click="signup()" class="registerBtn" />
         <p class="loginText">¿Ya tienes una cuenta?<br>
         <button class="loginBtn" id="registerToLogin">Inicie sesion</button> ahora</p>
-      </form>
+      </div>
     </div>
     <div class="background"></div>
   </div>
@@ -40,18 +40,24 @@
 
 <script>
 import Button from './micro-components/Button.vue';
+import { Credentials } from '../../api/user';
 
 export default {
   name: "Signup",
   components: {
     Button
   },
+  data() {
+    return {
+      result: null
+    }
+  },
   mounted: function() {
     document.querySelector(".background").addEventListener("click", () => {
       document.querySelector(".signup").style.display = "none";
     })
 
-    document.querySelector(".closeBtn").addEventListener("click", () => {
+    document.querySelector(".signup .closeBtn").addEventListener("click", () => {
       document.querySelector(".signup").style.display = "none";
     })
 
@@ -86,6 +92,30 @@ export default {
         x.type = "password";
         y.style.display = "none";
         z.style.display = "block";
+      }
+    },
+    setResult(result){
+      this.result = JSON.stringify(result, null, 2)
+    },
+    clearResult() {
+      this.result = null
+    },
+    async signup() {
+      try {
+        const name = document.getElementById('signupName').value;
+        const surname = document.getElementById('signupSurname').value;
+        const email = document.getElementById('signupEmail').value;
+        const firstPassword = document.getElementById('firstPassword').value;
+        const confirmPassword = document.getElementById('secondPassword').value;
+        if(firstPassword != confirmPassword) {
+          return;
+        }
+        
+
+        const credentials = new Credentials(user, password);
+        this.clearResult();
+      } catch(e) {
+        this.setResult(e);
       }
     },
   }
@@ -153,7 +183,7 @@ export default {
     }
 
 
-    form {
+    .formContent {
       .loginText {
         margin-top: 1.5em;
         font-size: 16px;

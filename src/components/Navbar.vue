@@ -4,9 +4,17 @@
       <router-link to="/" class="logo">traning</router-link>
       <div class="links">
         <router-link to="/">Inicio</router-link>
-        <a href="#herramientas">Herramientas</a>
-        <button class="register" id="register">Registrarse</button>
-        <button id="loginBtn">Acceder</button>
+        <a href="#herramientas" :hidden="$isLoggedIn">Herramientas</a>
+        <div class="loggedInBtns" :hidden="!$isLoggedIn">
+          <router-link to="/perfil">Perfil</router-link>
+          <router-link to="/ejercicios">Ejercicios</router-link>
+          <router-link to="/rutinas">Rutinas</router-link>
+          <button @click="logout()" id="logoutBtn">Cerrar Sesion</button>
+        </div>
+        <div class="noLoggedInBtns" :hidden="$isLoggedIn">
+          <button class="register" id="register">Registrarse</button>
+          <button id="loginBtn">Acceder</button>
+        </div>
       </div>
     </nav>
     <Signup />
@@ -17,7 +25,7 @@
 <script>
 import Signup from './Signup.vue'
 import Login from './Login.vue'
-
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: "Navbar",
@@ -25,21 +33,52 @@ export default {
     Signup,
     Login
   },
+  data() {
+    return {
+      result: null,
+    }
+  },
+  computed: {
+    ...mapState('security', {
+      $user: state => state.user,
+    }),
+    ...mapGetters('security', {
+      $isLoggedIn: 'isLoggedIn'
+    }),
+  },
+  methods: {
+    ...mapActions('security', {
+      $logout: 'logout',
+    }),
+    setResult(result){
+      this.result = JSON.stringify(result, null, 2)
+    },
+    clearResult() {
+      this.result = null
+    },
+    async logout() {
+      await this.$logout();
+      this.$router.push('/');
+      this.clearResult();
+    }
+  },
   mounted: function() {
-    document.getElementById("register").addEventListener("click", function() {
+    document.getElementById("register").addEventListener("click", function(e) {
       document.querySelector(".signup").style.display = "flex";
     });
 
-    document.getElementById("loginBtn").addEventListener("click", function() {
+    document.getElementById("loginBtn").addEventListener("click", function(e) {
       document.querySelector(".login").style.display = "flex";
     });
 
-    document.getElementById("loginToRegister").addEventListener("click", function() {
+    document.getElementById("loginToRegister").addEventListener("click", function(e) {
+      e.preventDefault();
       document.querySelector(".signup").style.display = "flex";
       document.querySelector(".login").style.display = "none";
     });
 
-    document.getElementById("registerToLogin").addEventListener("click", function() {
+    document.getElementById("registerToLogin").addEventListener("click", function(e) {
+      e.preventDefault();
       document.querySelector(".signup").style.display = "none";
       document.querySelector(".login").style.display = "flex";
     });
@@ -49,6 +88,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  [hidden] { display: none !important; }
+
   nav {
     display: flex;
     width: 90%;
@@ -56,6 +97,10 @@ export default {
     justify-content: space-between;
     align-items: center;
     height: 70px;
+
+    .noLoginBtn {
+      display: inline;
+    }
 
     .logo {
       font-size: 1.6em;
@@ -76,6 +121,16 @@ export default {
         box-shadow: none;
         letter-spacing: inherit;
         font-size: inherit;
+      }
+
+      .loggedInBtns, .noLoggedInBtns {
+        margin: 0;
+        padding: 0;
+        display: inline;
+      }
+
+      #logoutBtn {
+        margin-left: 4rem;
       }
     }
   }

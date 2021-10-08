@@ -52,6 +52,7 @@
       border-right: 6px solid transparent;
       position: absolute;
       right: 2px;
+      cursor: pointer;
     }
 
     .arrow-up {

@@ -5,11 +5,11 @@
       <h2 class="title">Iniciar Sesion</h2>
       <hr class="loginBar">
 
-      <form class="formContent">
-        <input type="text" placeholder="email..." class="input" />
+      <div class="formContent">
+        <input type="email" placeholder="email..." class="input" id="loginUser" />
         
         <div class="passwordBox">
-          <input type="password" placeholder="contraseña..." class="input" id="firstLoginPassword" />
+          <input type="password" placeholder="contraseña..." class="input" id="loginPassword" />
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_2">mdi-eye-off</v-icon>
@@ -17,10 +17,10 @@
         </div>
         <a class="restrictionText">¿Olvidaste tu contraseña?</a>
 
-        <input type="button" value="Iniciar Sesion" class="loginBtn" />
+        <button @click="login()" class="loginBtn" >Iniciar Sesion</button>
         <p class="loginText">No tienes una cuenta?<br>
         <button class="registerText" id="loginToRegister">Registrate</button> ahora</p>
-      </form>
+      </div>
     </div>
     <div class="loginBackground"></div>
   </div>
@@ -28,24 +28,35 @@
 
 <script>
 import Button from './micro-components/Button.vue';
+import { Credentials } from '../../api/user';
+import {mapActions} from 'vuex';
 
 export default {
   name: "login",
   components: {
-    Button
+    Button,
+    Credentials,
+  },
+  data() {
+    return {
+      result: null,
+    }
   },
   mounted: function() {
     document.querySelector(".loginBackground").addEventListener("click", () => {
       document.querySelector(".login").style.display = "none";
     })
 
-    document.querySelector(".closeBtn").addEventListener("click", () => {
+    document.querySelector(".login .closeBtn").addEventListener("click", () => {
       document.querySelector(".login").style.display = "none";
     })
   },
   methods: {
+    ...mapActions('security', {
+      $login: 'login',
+    }),
     hideFirstEye: function() {
-      var x = document.getElementById("firstLoginPassword");
+      var x = document.getElementById("loginPassword");
       var y = document.getElementById("loginEyeBox1_2");
       var z = document.getElementById("loginEyeBox1_1");
 
@@ -58,12 +69,35 @@ export default {
         y.style.display = "none";
         z.style.display = "block";
       }
-    }
+    },
+    setResult(result){
+      this.result = JSON.stringify(result, null, 2)
+    },
+    clearResult() {
+      this.result = null
+    },
+    async login() {
+      try {
+        const user = document.getElementById('loginUser').value;
+        const password = document.getElementById('loginPassword').value;
+        const credentials = new Credentials(user, password);
+        console.log(credentials);
+        await this.$login({credentials, rememberMe: true });
+        this.clearResult();
+        document.querySelector(".login").style.display = "none";
+        this.$router.push('/rutinas');
+      } catch (e) {
+        this.setResult(e);
+        console.log(e);
+      }
+    },
   }
 }
 </script>
 
 <style scoped lang="scss">
+
+
 
   .login {
     display:none;
@@ -126,7 +160,7 @@ export default {
     }
 
 
-    form {
+    .formContent {
       .loginText {
         margin-top: 1.5em;
         font-size: 16px;

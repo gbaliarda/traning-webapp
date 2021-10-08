@@ -7,11 +7,34 @@
 
 <script>
 import Navbar from './components/Navbar.vue';
+import {mapState, mapGetters} from 'vuex'
 
 export default {
   name: "App",
   components: {
     Navbar,
+  },
+  data() {
+    return {
+      result: null,
+    }
+  },
+  computed: {
+    ...mapState('security', {
+      $user: state => state.user,
+    }),
+    ...mapGetters('security', {
+      $isLoggedIn: 'isLoggedIn'
+    }),
+    canCreate() {
+      return this.$isLoggedIn && !this.sport
+    },
+    canOperate() {
+      return this.$isLoggedIn && this.sport
+    },
+    canAbort() {
+      return this.$isLoggedIn && this.controller
+    }
   },
 };
 

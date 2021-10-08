@@ -34,13 +34,22 @@
         <button class="loginBtn" id="registerToLogin">Inicie sesion</button> ahora</p>
       </div>
     </div>
+    <div class="verifyEmail">
+      <h2 class="title">Verifica tu e-mail</h2>
+      <hr>
+      <input type="text" placeholder="inserte el codigo..." class="input" id="verifyCode" />
+      <p class="resendEmail" @click="resendEmail()">Reenviar e-mail de verificacion</p>
+      <input type="button" value="Verificar" @click="verifyEmail()" class="verifyBtn" />
+    </div>
     <div class="background"></div>
   </div>
 </template>
 
 <script>
 import Button from './micro-components/Button.vue';
-import { Credentials } from '../../api/user';
+import { Credentials, SignupCredentials } from '../../api/user';
+import { Api } from '../../api/api';
+import { mapActions } from 'vuex';
 
 export default {
   name: "Signup",
@@ -49,7 +58,9 @@ export default {
   },
   data() {
     return {
-      result: null
+      result: null,
+      email: '',
+      password: '',
     }
   },
   mounted: function() {
@@ -60,10 +71,11 @@ export default {
     document.querySelector(".signup .closeBtn").addEventListener("click", () => {
       document.querySelector(".signup").style.display = "none";
     })
-
-
   },
   methods: {
+    ...mapActions('security', {
+      $login: 'login',
+    }),
     hideFirstEye: function() {
       var x = document.getElementById("firstPassword");
       var y = document.getElementById("eyeBox1_2");
@@ -102,20 +114,60 @@ export default {
     },
     async signup() {
       try {
-        const name = document.getElementById('signupName').value;
-        const surname = document.getElementById('signupSurname').value;
-        const email = document.getElementById('signupEmail').value;
-        const firstPassword = document.getElementById('firstPassword').value;
+        const firstName = document.getElementById('signupName').value;
+        const lastName = document.getElementById('signupSurname').value;
+        this.email = document.getElementById('signupEmail').value;
+        this.password = document.getElementById('firstPassword').value;
         const confirmPassword = document.getElementById('secondPassword').value;
-        if(firstPassword != confirmPassword) {
+        if(this.password != confirmPassword) {
           return;
-        }
-        
+        } 
+        const credentials = new SignupCredentials(firstName, lastName, this.email, this.password);
+        const url = `${Api.baseUrl}/users`;
 
-        const credentials = new Credentials(user, password);
+        const result = await Api.post(url, false, credentials);
+        
+        document.querySelector('.signup-content').style.display = "none";
+        document.querySelector('.verifyEmail').style.display = "block";
+        console.log(result);
         this.clearResult();
       } catch(e) {
         this.setResult(e);
+        console.log(e);
+      }
+    },
+    async verifyEmail() {
+      try {
+        const verifyCode = document.getElementById('verifyCode').value;
+        const url = `${Api.baseUrl}/users/verify_email`;
+
+        const data = { "email": this.email, "code": verifyCode };
+        const result = await Api.post(url, false, data);
+
+        document.querySelector('.signup-content').style.display = "block";
+        document.querySelector('.login-content').style.display = "block";
+        document.querySelector('.verifyEmail').style.display = "none";
+        document.querySelector('.verifyLoginEmail').style.display = "none";
+        document.querySelector('.signup').style.display="none";
+        const credentials = new Credentials(this.email, this.password);
+
+        this.$login({credentials, rememberMe: true });
+        this.clearResult();
+        this.$router.push('/rutinas');
+      } catch(e) {
+        this.setResult(e);
+        console.log(e);
+      }
+    },
+    async resendEmail() {
+      try {
+        const url = `${Api.baseUrl}/users/resend_verification`;
+        const data = {'email': this.email};
+        const result = await Api.post(url ,false, data);
+        this.clearResult();
+      } catch(e) {
+        this.setResult(e);
+        console.log(e);
       }
     },
   }
@@ -136,6 +188,59 @@ export default {
     text-align: center;
     z-index: 2;
 
+    .title {
+      font-size: 30px;
+      font-weight: 300;
+      margin-bottom: .3em;
+      margin-top: .5em;
+    }
+
+    hr {
+      width: 90%;
+      background-color: #DA611B;
+      height: 1px;
+      border: none;
+      margin: auto;
+      margin-bottom: .5em;
+    }
+
+    .verifyEmail {
+      display: none;
+
+      height: 350px;
+      width: 600px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      position: relative;
+      z-index: 10;
+
+      .resendEmail {
+        color: #444;
+        margin-top: 0.6em;
+        margin-left: 2.4em;
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .input {
+        margin-top: 2.5em;
+        border: 1px solid #bfbfbf;
+        border-radius: 10px;
+        width: 90%;
+        height: 40px;
+        padding-left: .8em;
+      }
+
+      .verifyBtn {
+        margin-top: 3.5em;
+        width: 35%;
+        background: #DA611B;
+        padding: 0.7em;
+        border-radius: .6em;
+        color: #fff;
+      }
+    }
 
     .background {
       background-color: rgba(0, 0, 0, 0.6);
@@ -147,6 +252,8 @@ export default {
     }
 
     .signup-content {
+      display: block;
+
       height: 570px;
       width: 500px;
       background: #fff;
@@ -154,24 +261,6 @@ export default {
       border-radius: 5px;
       position: relative;
       z-index: 10;
-
-      .title {
-        font-size: 30px;
-        font-weight: 300;
-        margin-bottom: .3em;
-        margin-top: .5em;
-      }
-
-      hr {
-        width: 90%;
-        background-color: #DA611B;
-        height: 1px;
-        border: none;
-        margin: auto;
-        margin-bottom: .5em;
-
-
-      }
 
       .closeBtn {
         position: absolute;

@@ -22,6 +22,13 @@
         <button class="registerText" id="loginToRegister">Registrate</button> ahora</p>
       </div>
     </div>
+    <div class="verifyLoginEmail">
+      <h2 class="title">Verifica tu e-mail</h2>
+      <hr>
+      <input type="text" placeholder="inserte el codigo..." class="input" id="verifyLoginCode" /> 
+      <p class="resendEmail" @click="resendLoginEmail()">Reenviar e-mail de verifiacion</p>
+      <input type="button" value="Verificar" @click="verifyLoginEmail()" class="verifyBtn" />
+    </div>
     <div class="loginBackground"></div>
   </div>
 </template>
@@ -29,7 +36,8 @@
 <script>
 import Button from './micro-components/Button.vue';
 import { Credentials } from '../../api/user';
-import {mapActions} from 'vuex';
+import { Api } from '../../api/api';
+import { mapActions } from 'vuex';
 
 export default {
   name: "login",
@@ -40,6 +48,8 @@ export default {
   data() {
     return {
       result: null,
+      user: '',
+      password: '',
     }
   },
   mounted: function() {
@@ -78,15 +88,53 @@ export default {
     },
     async login() {
       try {
-        const user = document.getElementById('loginUser').value;
-        const password = document.getElementById('loginPassword').value;
-        const credentials = new Credentials(user, password);
+        this.user = document.getElementById('loginUser').value;
+        this.password = document.getElementById('loginPassword').value;
+        const credentials = new Credentials(this.user, this.password);
         console.log(credentials);
         await this.$login({credentials, rememberMe: true });
         this.clearResult();
         document.querySelector(".login").style.display = "none";
         this.$router.push('/rutinas');
       } catch (e) {
+        this.setResult(e);
+        if(e.code === 8 && e.details[0] === 'Email not verified') {
+          document.querySelector('.login-content').style.display = "none";
+          document.querySelector('.verifyLoginEmail').style.display = "block";
+        }
+        console.log(e);
+      }
+    },
+    async verifyLoginEmail() {
+      try {
+        const verifyCode = document.getElementById('verifyLoginCode').value;
+        const url = `${Api.baseUrl}/users/verify_email`;
+
+        const data = { "email": this.user, "code": verifyCode };
+        const result = await Api.post(url, false, data);
+
+        document.querySelector('.signup-content').style.display = "block";
+        document.querySelector('.login-content').style.display = "block";
+        document.querySelector('.verifyLoginEmail').style.display = "none";
+        document.querySelector('.verifyEmail').style.display = "none";
+        document.querySelector('.login').style.display="none";
+        const credentials = new Credentials(this.user, this.password);
+
+        this.$login({credentials, rememberMe: true });
+        this.clearResult();
+        this.$router.push('/rutinas');
+      } catch(e) {
+        this.setResult(e);
+        console.log(e);
+      }
+    },
+    async resendLoginEmail() {
+      try {
+        const url = `${Api.baseUrl}/users/resend_verification`;
+        const data = {'email': this.user};
+        const result = await Api.post(url ,false, data);
+        this.clearResult();
+      } catch(e) {
         this.setResult(e);
         console.log(e);
       }
@@ -96,11 +144,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
-
-
   .login {
-    display:none;
+    display: none;
     position: fixed; 
     transition: 200ms ease-in-out;
     width: 100%;
@@ -111,6 +156,59 @@ export default {
     text-align: center;
     z-index: 2;
 
+    .verifyLoginEmail {
+      display: none;
+
+      height: 350px;
+      width: 600px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      position: relative;
+      z-index: 10;
+
+      .resendEmail {
+        color: #444;
+        margin-top: 0.6em;
+        margin-left: 2.4em;
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .input {
+        margin-top: 2.5em;
+        border: 1px solid #bfbfbf;
+        border-radius: 10px;
+        width: 90%;
+        height: 40px;
+        padding-left: .8em;
+      }
+
+      .verifyBtn {
+        margin-top: 3.5em;
+        width: 35%;
+        background: #DA611B;
+        padding: 0.7em;
+        border-radius: .6em;
+        color: #fff;
+      }
+
+      .title {
+      font-size: 30px;
+      font-weight: 300;
+      margin-bottom: .3em;
+      margin-top: .5em;
+      }
+
+      hr {
+        width: 90%;
+        background-color: #DA611B;
+        height: 1px;
+        border: none;
+        margin: auto;
+        margin-bottom: .5em;
+      }
+    }
 
     .loginBackground {
       background-color: rgba(0, 0, 0, 0.6);

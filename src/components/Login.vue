@@ -22,7 +22,12 @@
         </div>
         <a class="restrictionText">¿Olvidaste tu contraseña?</a>
 
-        <button @click="login()" class="loginBtn" >Iniciar Sesion</button>
+        <div class="registerBtnBox">
+          <button v-if="!loading" @click="login()" class="loginBtn" >Iniciar Sesion</button>
+          <div v-else class="loadingBtn">
+            <Spinner />
+          </div>
+        </div>
         <p class="loginText">No tienes una cuenta?<br>
         <button class="registerText" id="loginToRegister">Registrate</button> ahora</p>
       </div>
@@ -35,7 +40,13 @@
         <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
       </div>
       <p class="resendEmail" @click="resendLoginEmail()">Reenviar e-mail de verifiacion</p>
-      <input type="button" value="Verificar" @click="verifyLoginEmail()" class="verifyBtn" />
+
+      <div class="registerBtnBox">
+        <input v-if="!loadingVerify" type="button" value="Verificar" @click="verifyLoginEmail()" class="verifyBtn" />
+        <div v-else class="loadingBtn">
+          <Spinner />
+        </div>
+      </div>
     </div>
     <div class="loginBackground"></div>
   </div>
@@ -43,6 +54,7 @@
 
 <script>
 import Button from './micro-components/Button.vue';
+import Spinner from "./micro-components/Spinner.vue";
 import { Credentials } from '../../api/user';
 import { Api } from '../../api/api';
 import { mapActions } from 'vuex';
@@ -52,12 +64,15 @@ export default {
   components: {
     Button,
     Credentials,
+    Spinner,
   },
   data() {
     return {
       result: '',
       user: '',
       password: '',
+      loading: false,
+      loadingVerify: false,
     }
   },
   mounted: function() {
@@ -109,7 +124,9 @@ export default {
         this.password = document.getElementById('loginPassword').value;
         const credentials = new Credentials(this.user, this.password);
         console.log(credentials);
+        this.loading = true;
         await this.$login({credentials, rememberMe: true });
+        this.loading = false;
         this.clearResult();
         document.querySelector(".login").style.display = "none";
         this.$router.push('/rutinas');
@@ -121,6 +138,7 @@ export default {
         }
         console.log(e);
       }
+      this.loading = false;
     },
     async verifyLoginEmail() {
       try {
@@ -128,6 +146,7 @@ export default {
         const url = `${Api.baseUrl}/users/verify_email`;
 
         const data = { "email": this.user, "code": verifyCode };
+        this.loading = true;
         const result = await Api.post(url, false, data);
 
         document.querySelector('.signup-content').style.display = "block";
@@ -138,23 +157,27 @@ export default {
         const credentials = new Credentials(this.user, this.password);
 
         this.$login({credentials, rememberMe: true });
+        this.loading = false;
         this.clearResult();
         this.$router.push('/rutinas');
       } catch(e) {
         this.setResult(e);
         console.log(e);
       }
+      this.loading = false;
     },
     async resendLoginEmail() {
       try {
         const url = `${Api.baseUrl}/users/resend_verification`;
         const data = {'email': this.user};
+        this.loadingVerify = true;
         const result = await Api.post(url ,false, data);
         this.clearResult();
       } catch(e) {
         this.setResult(e);
         console.log(e);
       }
+      this.loadingVerify = false;
     },
   },
   watch: {
@@ -189,6 +212,23 @@ export default {
     align-items: center;
     text-align: center;
     z-index: 2;
+
+    .registerBtnBox {
+      display: flex;
+      justify-content: center;
+    }
+
+    .loadingBtn {
+      position: relative;
+      margin-top: 2.5em;
+      width: 35%;
+      height: 42px;
+      background: #fff;
+      padding: 0.7em;
+      border: 1px solid #DA611B;
+      border-radius: .6em;
+      color: #DA611B;
+    }
 
 
     .verifyLoginEmail {

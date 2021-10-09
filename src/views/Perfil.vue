@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1 id="title">Mi perfil</h1>
-    <div class="row">
+    <div v-if="!loadingProfile" class="row">
       <div id="picture-container">
         <img
           src="../assets/account_circle.svg"
@@ -18,9 +18,9 @@
           align="center"
         >
           <h2 id="info-title">Información Básica</h2>
-          <v-icon class="editIcon editProfileInfo">mdi-pencil</v-icon>
-          <v-icon class="confirmEdit confirmProfileInfo">mdi-check</v-icon>
-          <v-icon class="cancelEdit cancelProfileInfo">mdi-close</v-icon>
+          <v-icon class="editIcon editProfileInfo" @click="editProfileInfo">mdi-pencil</v-icon>
+          <v-icon class="confirmEdit confirmProfileInfo" @click="confirmProfileInfo">mdi-check</v-icon>
+          <v-icon class="cancelEdit cancelProfileInfo" @click="cancelProfileInfo">mdi-close</v-icon>
         </div>
         <h3 class="info-item"><span class="infoTitle">Nombre:</span>
           <p class="infoName" id="infoName">{{result.firstName}}</p>
@@ -30,23 +30,30 @@
           <p class="infoName" id="infoEmail">{{result.email}}</p>
           <input type="email" id="editEmail" v-model="result.email"/>
         </h3>
-        <button id="pass-btn" class="button">Cambiar contraseña</button>
       </div>
+    </div>
+    <div v-else>
+      <Spinner />
     </div>
   </div>
 </template>
 
 <script>
+import Spinner from "../components/micro-components/Spinner.vue"
 import { mapActions, mapState } from 'vuex';
 import { Api } from '../../api/api.js';
 
 export default {
   name: "Profile",
+  components: {
+    Spinner,
+  },
   data() {
     return {
       result: {},
       bEmail: '',
       bName: '',
+      loadingProfile: false,
     }
   },
   computed: {
@@ -64,25 +71,7 @@ export default {
     clearResult() {
       this.result = null
     },
-    async getCurrentUser() {
-      await this.$getCurrentUser()
-      this.setResult(this.$user)
-    },
-    async changeProfileInfo(data) {
-      try {
-        const url = `${Api.baseUrl}/users/current`;
-
-        const result = await Api.put(url, true, data);
-      } catch(e) {
-        console.log(e);
-      }
-    },
-  },
-  beforeMount() {
-    this.getCurrentUser();
-  },
-  mounted() {
-    document.querySelector('.editProfileInfo').addEventListener('click', () => {
+    editProfileInfo() {
       this.bEmail = this.result.email;
       this.bName = this.result.firstName;
 
@@ -94,10 +83,8 @@ export default {
       document.querySelector('.editProfileInfo').style.display = "none";
       document.querySelector('.confirmProfileInfo').style.display = "inline";
       document.querySelector('.cancelProfileInfo').style.display = "inline";
-
-    });
-
-    document.querySelector('.confirmProfileInfo').addEventListener('click', () => {
+    },
+    confirmProfileInfo() {
       const nameEl = document.getElementById("editName");
       const emailEl = document.getElementById("editEmail");
 
@@ -111,11 +98,10 @@ export default {
 
       const name = nameEl.value;
       const email = emailEl.value;
-      const data = {"firstName": name, "email":email, "username":email};
+      const data = {"firstName": name, "email":email};
       this.changeProfileInfo(data);
-    });
-
-    document.querySelector('.cancelProfileInfo').addEventListener('click', () => {
+    },
+    cancelProfileInfo() {
       document.getElementById("infoName").style.display = "inline";
       document.getElementById("infoEmail").style.display = "inline";
       document.getElementById("editName").style.display = "none";
@@ -126,7 +112,28 @@ export default {
 
       this.result.firstName = this.bName;
       this.result.email = this.bEmail;
-    });
+    },
+    async getCurrentUser() {
+      this.loadingProfile = true;
+      await this.$getCurrentUser()
+      this.setResult(this.$user)
+      this.loadingProfile = false;
+    },
+    async changeProfileInfo(data) {
+      if(this.bName == data.firstName && this.bEmail == data.email)
+        return;
+      try {
+        const url = `${Api.baseUrl}/users/current`;
+        this.loadingProfile = true;
+        const result = await Api.put(url, true, data);
+      } catch(e) {
+        console.log(e);
+      }
+    this.loadingProfile = false;
+    },
+  },
+  created() {
+    this.getCurrentUser();
   }
 };
 </script>
@@ -156,13 +163,13 @@ h3 {
 .confirmEdit {
   display: none;
   cursor: pointer;
-  color: green;
+  color: #DA611B;
 }
 
 .cancelEdit {
   display: none;
   cursor: pointer;
-  color: red;
+  color: #888;
 }
 
 .infoName {
@@ -179,12 +186,6 @@ h3 {
   margin-top: 4em;
 }
 
-.button {
-  color: white;
-  background: #ea8d59;
-  padding: 10px;
-  border-radius: 10px;
-}
 
 .row {
   display: flex;
@@ -213,6 +214,7 @@ h3 {
 }
 
 #picture-container {
+  min-height: 306px;
   position: relative;
   margin-right: 100px;
   border: 1px solid;

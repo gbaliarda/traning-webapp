@@ -4,7 +4,6 @@
       <div class="left">
         <h2 class="title">Crea tus rutinas de forma rápida y sencilla</h2>
         <h3 class="subtitle">Brindamos la mejor interfaz de control de rutinas de Latinoamérica.</h3>
-        <Button text="Comenzar" class ="btn"/>
       </div>
       <div class="right">
         <img src="../assets/imgHome.svg" alt="Man exercising" />

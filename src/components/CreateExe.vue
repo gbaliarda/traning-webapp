@@ -36,6 +36,9 @@ export default {
     Button,
     Spinner,
   },
+  props: {
+    getterEx: Function,
+  },
   data() {
     return {
       nombre: "",
@@ -72,7 +75,9 @@ export default {
       this.loading = true;
       try {
         await Api.post(url, true, payload);
-        this.error = null;
+        this.error = {};
+        this.$store.commit("setShowing", false);
+        this.getterEx();
       } catch(e) {
         if (e.code == 99)
           this.error.description = "Error al guardar ejercicio";

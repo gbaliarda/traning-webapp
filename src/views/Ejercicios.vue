@@ -6,14 +6,14 @@
     </div>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
     <div :class="loading ? 'hidden' : 'ejercicios'">
-      <ExerciseCard v-for="ex in exercises" :key="id" :titulo="ex.title" :grupo="ex.metadata.grupo" :dificultad="ex.metadata.dif" />
+      <ExerciseCard v-for="ex in exercises" :key="ex.id" :titulo="ex.name" :grupo="ex.metadata.grupo" :dificultad="ex.metadata.dif" />
       <div @click="openModal">
         <AddButton />
       </div>
     </div>
     <Spinner :class="{'hidden': !loading}" />
     <Modal title="Crear ejercicio">
-      <CreateExe />
+      <CreateExe :getterEx="getExercises" />
     </Modal>
   </div>
 </template>
@@ -47,20 +47,23 @@ export default {
   methods: {
     openModal() {
       this.$store.commit("setShowing", true);
+    },
+    async getExercises() {
+      const url = `${Api.baseUrl}/exercises`;
+      try {
+        const res = await Api.get(url, true);
+        this.exercises = res.content;
+      } catch(e) {
+        if (e.code == 99)
+          this.error.description = "Error al cargar ejercicios";
+        else
+          this.error = e;
+      }
+      this.loading = false;
     }
   },
-  async created() {
-    const url = `${Api.baseUrl}/exercises`;
-    try {
-      const res = await Api.get(url, true);
-      this.exercises = res.content;
-    } catch(e) {
-      if (e.code == 99)
-        this.error.description = "Error al cargar ejercicios";
-      else
-        this.error = e;
-    }
-    this.loading = false;
+  created() {
+    this.getExercises();
   }
 };
 </script>

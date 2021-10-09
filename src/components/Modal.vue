@@ -45,7 +45,7 @@ export default {
   width: 100%;
   height: 100vh;
   background: #000;
-  opacity: .7;
+  opacity: .6;
 }
 
 .box {
@@ -55,6 +55,7 @@ export default {
   min-height: 300px;
   z-index: 1;
   position: relative;
+  border-radius: 5px;
 
   h3 {
     text-align: center;

@@ -40,7 +40,13 @@
         </div>
         <span class="restrictionText">Al menos 8 caracteres combinando letras y números</span>
 
-        <input type="button" value="Registrarse" @click="signup()" class="registerBtn" />
+        <div class="registerBtnBox">
+          <input v-if="!loading" type="button" value="Registrarse" @click="signup()" class="registerBtn" />
+          <div v-else class="loadingBtn">
+            <Spinner />
+          </div>
+        </div>
+        
         <p class="loginText">¿Ya tienes una cuenta?<br>
         <button class="loginBtn" id="registerToLogin">Inicie sesion</button> ahora</p>
       </div>
@@ -53,7 +59,13 @@
         <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
       </div>
       <p class="resendEmail" @click="resendEmail()">Reenviar e-mail de verificacion</p>
-      <input type="button" value="Verificar" @click="verifyEmail()" class="verifyBtn" />
+
+      <div class="registerBtnBox">
+        <input v-if="!loadingVerify" type="button" value="Verificar" @click="verifyEmail()" class="verifyBtn" />
+        <div v-else class="loadingBtn">
+          <Spinner />
+        </div>
+      </div>
     </div>
     <div class="background"></div>
   </div>
@@ -61,6 +73,7 @@
 
 <script>
 import Button from './micro-components/Button.vue';
+import Spinner from "./micro-components/Spinner.vue";
 import { Credentials, SignupCredentials } from '../../api/user';
 import { Api } from '../../api/api';
 import { mapActions } from 'vuex';
@@ -68,13 +81,16 @@ import { mapActions } from 'vuex';
 export default {
   name: "Signup",
   components: {
-    Button
+    Button,
+    Spinner,
   },
   data() {
     return {
       result: '',
       email: '',
       password: '',
+      loading: false,
+      loadingVerify: false,
     }
   },
   mounted: function() {
@@ -164,8 +180,9 @@ export default {
         const credentials = new SignupCredentials(firstName, lastName, this.email, this.password);
         const url = `${Api.baseUrl}/users`;
 
+        this.loading = true;
         const result = await Api.post(url, false, credentials);
-        
+
         document.querySelector('.signup-content').style.display = "none";
         document.querySelector('.verifyEmail').style.display = "block";
         console.log(result);
@@ -174,6 +191,7 @@ export default {
         this.setResult(e);
         console.log(e);
       }
+      this.loading = false;
     },
     async verifyEmail() {
       try {
@@ -181,6 +199,7 @@ export default {
         const url = `${Api.baseUrl}/users/verify_email`;
 
         const data = { "email": this.email, "code": verifyCode };
+        this.loadingVerify = true;
         const result = await Api.post(url, false, data);
 
         document.querySelector('.signup-content').style.display = "block";
@@ -191,12 +210,14 @@ export default {
         const credentials = new Credentials(this.email, this.password);
 
         this.$login({credentials, rememberMe: true });
+        this.loadingVerify = false;
         this.clearResult();
         this.$router.push('/rutinas');
       } catch(e) {
         this.setResult(e);
         console.log(e);
       }
+      this.loadingVerify = false;
     },
     async resendEmail() {
       try {
@@ -244,6 +265,23 @@ export default {
     align-items: center;
     text-align: center;
     z-index: 2;
+
+    .registerBtnBox {
+      display: flex;
+      justify-content: center;
+    }
+
+    .loadingBtn {
+      position: relative;
+      margin-top: 2.5em;
+      width: 35%;
+      height: 42px;
+      background: #fff;
+      padding: 0.7em;
+      border: 1px solid #DA611B;
+      border-radius: .6em;
+      color: #DA611B;
+    }
 
     .title {
       font-size: 30px;

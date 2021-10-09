@@ -1,6 +1,6 @@
 import { Api } from './api.js'
 
-export { UserApi, Credentials }
+export { UserApi, Credentials, SignupCredentials }
 
 class UserApi {
     static getUrl(slug) {
@@ -24,5 +24,15 @@ class Credentials {
     constructor(username, password) {
         this.username = username
         this.password = password
+    }
+}
+
+class SignupCredentials {
+    constructor(firstName, lastName, username, password) {
+        this.username = username
+        this.password = password
+        this.firstName = firstName+' '+lastName;
+        this.email = username;
+        this.metadata = null;
     }
 }

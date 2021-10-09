@@ -6,13 +6,18 @@
       <hr class="loginBar">
 
       <div class="formContent">
-        <input type="email" placeholder="Email" class="input" id="loginUser" />
-        
+        <input type="email" placeholder="Email" class="input" id="loginUser" :class="{ 'error' : invalidUsername()}" />
+        <div class="errorTextBox">
+          <p class="errorText" :class="{ 'showError' : invalidUsername()}">Usuario invalido</p>
+        </div>
         <div class="passwordBox">
-          <input type="password" placeholder="Contraseña" class="input" id="loginPassword" />
+          <input type="password" placeholder="Contraseña" class="input" id="loginPassword" :class="{ 'error' : invalidPassword()}" />
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_2">mdi-eye-off</v-icon>
+          </div>
+          <div class="errorTextBox">
+            <p class="errorText" :class="{ 'showError' : invalidPassword()}">Contraseña invalida</p>
           </div>
         </div>
         <a class="restrictionText">¿Olvidaste tu contraseña?</a>
@@ -22,6 +27,16 @@
         <button class="registerText" id="loginToRegister">Registrate</button> ahora</p>
       </div>
     </div>
+    <div class="verifyLoginEmail">
+      <h2 class="title">Verifica tu e-mail</h2>
+      <hr>
+      <input type="text" placeholder="Inserte el codigo" class="input" id="verifyLoginCode" :class="{ 'error' : invalidEmailVerification()}" /> 
+      <div class="errorTextBox">
+        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
+      </div>
+      <p class="resendEmail" @click="resendLoginEmail()">Reenviar e-mail de verifiacion</p>
+      <input type="button" value="Verificar" @click="verifyLoginEmail()" class="verifyBtn" />
+    </div>
     <div class="loginBackground"></div>
   </div>
 </template>
@@ -29,7 +44,8 @@
 <script>
 import Button from './micro-components/Button.vue';
 import { Credentials } from '../../api/user';
-import {mapActions} from 'vuex';
+import { Api } from '../../api/api';
+import { mapActions } from 'vuex';
 
 export default {
   name: "login",
@@ -39,7 +55,9 @@ export default {
   },
   data() {
     return {
-      result: null,
+      result: '',
+      user: '',
+      password: '',
     }
   },
   mounted: function() {
@@ -55,6 +73,15 @@ export default {
     ...mapActions('security', {
       $login: 'login',
     }),
+    invalidUsername() {
+      return this.result.code == 4 && this.result.details[0] === 'Username does not exist';
+    },
+    invalidPassword() {
+      return this.result.code == 4 && this.result.details[0] === 'Password does not match';
+    },
+    invalidEmailVerification() {
+      return this.result.code == 8 && this.result.details[0] == "Invalid verification code";
+    },
     hideFirstEye: function() {
       var x = document.getElementById("loginPassword");
       var y = document.getElementById("loginEyeBox1_2");
@@ -71,16 +98,16 @@ export default {
       }
     },
     setResult(result){
-      this.result = JSON.stringify(result, null, 2)
+      this.result = result
     },
     clearResult() {
-      this.result = null
+      this.result = ''
     },
     async login() {
       try {
-        const user = document.getElementById('loginUser').value;
-        const password = document.getElementById('loginPassword').value;
-        const credentials = new Credentials(user, password);
+        this.user = document.getElementById('loginUser').value;
+        this.password = document.getElementById('loginPassword').value;
+        const credentials = new Credentials(this.user, this.password);
         console.log(credentials);
         await this.$login({credentials, rememberMe: true });
         this.clearResult();
@@ -88,19 +115,71 @@ export default {
         this.$router.push('/rutinas');
       } catch (e) {
         this.setResult(e);
+        if(e.code === 8 && e.details[0] === 'Email not verified') {
+          document.querySelector('.login-content').style.display = "none";
+          document.querySelector('.verifyLoginEmail').style.display = "block";
+        }
         console.log(e);
       }
     },
+    async verifyLoginEmail() {
+      try {
+        const verifyCode = document.getElementById('verifyLoginCode').value;
+        const url = `${Api.baseUrl}/users/verify_email`;
+
+        const data = { "email": this.user, "code": verifyCode };
+        const result = await Api.post(url, false, data);
+
+        document.querySelector('.signup-content').style.display = "block";
+        document.querySelector('.login-content').style.display = "block";
+        document.querySelector('.verifyLoginEmail').style.display = "none";
+        document.querySelector('.verifyEmail').style.display = "none";
+        document.querySelector('.login').style.display="none";
+        const credentials = new Credentials(this.user, this.password);
+
+        this.$login({credentials, rememberMe: true });
+        this.clearResult();
+        this.$router.push('/rutinas');
+      } catch(e) {
+        this.setResult(e);
+        console.log(e);
+      }
+    },
+    async resendLoginEmail() {
+      try {
+        const url = `${Api.baseUrl}/users/resend_verification`;
+        const data = {'email': this.user};
+        const result = await Api.post(url ,false, data);
+        this.clearResult();
+      } catch(e) {
+        this.setResult(e);
+        console.log(e);
+      }
+    },
+  },
+  watch: {
+    result: function (res) {
+      switch(res.code) {
+        case 4: {
+          switch(res.details[0]) {
+            case 'Username does not exist':
+              document.querySelector('#loginUser').focus();
+              break;
+            case 'Password does not match':
+              document.querySelector('#loginPassword').focus();
+              break;
+          }
+          break;
+        }
+      }
+    }
   }
 }
 </script>
 
 <style scoped lang="scss">
-
-
-
   .login {
-    display:none;
+    display: none;
     position: fixed; 
     transition: 200ms ease-in-out;
     width: 100%;
@@ -111,6 +190,60 @@ export default {
     text-align: center;
     z-index: 2;
 
+
+    .verifyLoginEmail {
+      display: none;
+
+      height: 350px;
+      width: 600px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      position: relative;
+      z-index: 10;
+
+      .resendEmail {
+        color: #444;
+        margin-top: 0.6em;
+        margin-left: 2.4em;
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .input {
+        margin-top: 2.5em;
+        border: 1px solid #bfbfbf;
+        border-radius: 10px;
+        width: 90%;
+        height: 40px;
+        padding-left: .8em;
+      }
+
+      .verifyBtn {
+        margin-top: 3.5em;
+        width: 35%;
+        background: #DA611B;
+        padding: 0.7em;
+        border-radius: .6em;
+        color: #fff;
+      }
+
+      .title {
+      font-size: 30px;
+      font-weight: 300;
+      margin-bottom: .3em;
+      margin-top: .5em;
+      }
+
+      hr {
+        width: 90%;
+        background-color: #DA611B;
+        height: 1px;
+        border: none;
+        margin: auto;
+        margin-bottom: .5em;
+      }
+    }
 
     .loginBackground {
       background-color: rgba(0, 0, 0, 0.6);
@@ -228,5 +361,29 @@ export default {
       }
     }
 
+    .errorTextBox {
+      text-align: left;
+    }
+
+    .error{
+      border: 1px solid red !important;
+    }
+
+    .error:focus {
+      outline: none !important;
+      border: 2.5px solid red !important;
+    }
+
+    .errorText{
+      display: none;
+      color: red;
+      font-size: 14px;
+      margin-left: 3em;
+    }
+
+    .showError {
+      display: inline !important;
+      text-align: left !important;
+    }
   }
 </style>

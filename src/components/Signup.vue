@@ -7,15 +7,15 @@
 
       <div class="formContent">
         <div class="namesDiv">
-          <input type="text" placeholder="Nombre..." class="input nameInput" id="signupName"/>
-          <input type="text" placeholder="Apellido..." class="input nameInput" id="signupSurname"/>
+          <input type="text" placeholder="Nombre" class="input nameInput" id="signupName"/>
+          <input type="text" placeholder="Apellido" class="input nameInput" id="signupSurname"/>
         </div>
-        <input type="email" placeholder="Email..." class="input" id="signupEmail" :class="{ 'error' : invalidEmail()}"/>
+        <input type="email" placeholder="Email" class="input" id="signupEmail" :class="{ 'error' : invalidEmail()}"/>
         <div class="errorTextBox">
           <p class="errorText" :class="{ 'showError' : invalidEmail()}">Email invalido</p>
         </div>
         <div class="passwordBox">
-          <input type="password" placeholder="Contraseña..." class="input" id="firstPassword" :class="{ 'error' : invalidPassword()}"/>
+          <input type="password" placeholder="Contraseña" class="input" id="firstPassword" :class="{ 'error' : invalidPassword()}"/>
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="eyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="eyeBox1_2">mdi-eye-off</v-icon>
@@ -29,7 +29,7 @@
         </div>
         
         <div class="passwordBox">
-          <input type="password" placeholder="Confirme su contraseña..." class="input" id="secondPassword" :class="{ 'error' : invalidConfirmPassword()}" />
+          <input type="password" placeholder="Confirme su contraseña" class="input" id="secondPassword" :class="{ 'error' : invalidConfirmPassword()}" />
           <div @click="hideSecondEye">
             <v-icon class="passwordEyeBtn" id="eyeBox2_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="eyeBox2_2">mdi-eye-off</v-icon>
@@ -48,7 +48,7 @@
     <div class="verifyEmail">
       <h2 class="title">Verifica tu e-mail</h2>
       <hr>
-      <input type="text" placeholder="Inserte el codigo..." class="input" id="verifyCode" :class="{ 'error' : invalidEmailVerification()}" />
+      <input type="text" placeholder="Inserte el codigo" class="input" id="verifyCode" :class="{ 'error' : invalidEmailVerification()}" />
       <div class="errorTextBox">
         <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
       </div>

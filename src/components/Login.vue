@@ -6,12 +6,12 @@
       <hr class="loginBar">
 
       <div class="formContent">
-        <input type="email" placeholder="Email..." class="input" id="loginUser" :class="{ 'error' : invalidUsername()}" />
+        <input type="email" placeholder="Email" class="input" id="loginUser" :class="{ 'error' : invalidUsername()}" />
         <div class="errorTextBox">
           <p class="errorText" :class="{ 'showError' : invalidUsername()}">Usuario invalido</p>
         </div>
         <div class="passwordBox">
-          <input type="password" placeholder="Contraseña..." class="input" id="loginPassword" :class="{ 'error' : invalidPassword()}" />
+          <input type="password" placeholder="Contraseña" class="input" id="loginPassword" :class="{ 'error' : invalidPassword()}" />
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_2">mdi-eye-off</v-icon>
@@ -30,7 +30,7 @@
     <div class="verifyLoginEmail">
       <h2 class="title">Verifica tu e-mail</h2>
       <hr>
-      <input type="text" placeholder="Inserte el codigo..." class="input" id="verifyLoginCode" :class="{ 'error' : invalidEmailVerification()}" /> 
+      <input type="text" placeholder="Inserte el codigo" class="input" id="verifyLoginCode" :class="{ 'error' : invalidEmailVerification()}" /> 
       <div class="errorTextBox">
         <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
       </div>

@@ -6,10 +6,10 @@
       <hr class="loginBar">
 
       <div class="formContent">
-        <input type="email" placeholder="email..." class="input" id="loginUser" />
+        <input type="email" placeholder="Email" class="input" id="loginUser" />
         
         <div class="passwordBox">
-          <input type="password" placeholder="contraseña..." class="input" id="loginPassword" />
+          <input type="password" placeholder="Contraseña" class="input" id="loginPassword" />
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_2">mdi-eye-off</v-icon>

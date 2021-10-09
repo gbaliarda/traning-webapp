@@ -7,13 +7,13 @@
 
       <div class="formContent">
         <div class="namesDiv">
-          <input type="text" placeholder="nombre..." class="input nameInput" id="signupName"/>
-          <input type="text" placeholder="apellido..." class="input nameInput" id="signupSurname"/>
+          <input type="text" placeholder="Nombre" class="input nameInput" id="signupName"/>
+          <input type="text" placeholder="Apellido" class="input nameInput" id="signupSurname"/>
         </div>
-        <input type="email" placeholder="email..." class="input" id="signupEmail"/>
+        <input type="email" placeholder="Email" class="input" id="signupEmail"/>
         
         <div class="passwordBox">
-          <input type="password" placeholder="contraseña..." class="input" id="firstPassword" />
+          <input type="password" placeholder="Contraseña" class="input" id="firstPassword" />
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="eyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="eyeBox1_2">mdi-eye-off</v-icon>
@@ -21,7 +21,7 @@
         </div>
         
         <div class="passwordBox">
-          <input type="password" placeholder="confirme su contraseña..." class="input" id="secondPassword" />
+          <input type="password" placeholder="Confirme su contraseña" class="input" id="secondPassword" />
           <div @click="hideSecondEye">
             <v-icon class="passwordEyeBtn" id="eyeBox2_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="eyeBox2_2">mdi-eye-off</v-icon>

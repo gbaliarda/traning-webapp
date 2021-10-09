@@ -7,24 +7,35 @@
 
       <div class="formContent">
         <div class="namesDiv">
-          <input type="text" placeholder="nombre..." class="input nameInput" id="signupName"/>
-          <input type="text" placeholder="apellido..." class="input nameInput" id="signupSurname"/>
+          <input type="text" placeholder="Nombre..." class="input nameInput" id="signupName"/>
+          <input type="text" placeholder="Apellido..." class="input nameInput" id="signupSurname"/>
         </div>
-        <input type="email" placeholder="email..." class="input" id="signupEmail"/>
-        
+        <input type="email" placeholder="Email..." class="input" id="signupEmail" :class="{ 'error' : invalidEmail()}"/>
+        <div class="errorTextBox">
+          <p class="errorText" :class="{ 'showError' : invalidEmail()}">Email invalido</p>
+        </div>
         <div class="passwordBox">
-          <input type="password" placeholder="contraseña..." class="input" id="firstPassword" />
+          <input type="password" placeholder="Contraseña..." class="input" id="firstPassword" :class="{ 'error' : invalidPassword()}"/>
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="eyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="eyeBox1_2">mdi-eye-off</v-icon>
           </div>
+          <div class="errorTextBox">
+            <p class="errorText" :class="{ 'showError' : invalidNullPassword()}">Contraseña no puede estar vacio</p>
+          </div>
+          <div class="errorTextBox">
+            <p class="errorText" :class="{ 'showError' : invalidLengthPassword()}">La contraseña tiene que tener mas de 8 caracteres</p>
+          </div>
         </div>
         
         <div class="passwordBox">
-          <input type="password" placeholder="confirme su contraseña..." class="input" id="secondPassword" />
+          <input type="password" placeholder="Confirme su contraseña..." class="input" id="secondPassword" :class="{ 'error' : invalidConfirmPassword()}" />
           <div @click="hideSecondEye">
             <v-icon class="passwordEyeBtn" id="eyeBox2_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="eyeBox2_2">mdi-eye-off</v-icon>
+          </div>
+          <div class="errorTextBox">
+            <p class="errorText" :class="{ 'showError' : invalidConfirmPassword()}">Las contraseñas no coinciden</p>
           </div>
         </div>
         <span class="restrictionText">Al menos 8 caracteres combinando letras y números</span>
@@ -37,7 +48,10 @@
     <div class="verifyEmail">
       <h2 class="title">Verifica tu e-mail</h2>
       <hr>
-      <input type="text" placeholder="inserte el codigo..." class="input" id="verifyCode" />
+      <input type="text" placeholder="Inserte el codigo..." class="input" id="verifyCode" :class="{ 'error' : invalidEmailVerification()}" />
+      <div class="errorTextBox">
+        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
+      </div>
       <p class="resendEmail" @click="resendEmail()">Reenviar e-mail de verificacion</p>
       <input type="button" value="Verificar" @click="verifyEmail()" class="verifyBtn" />
     </div>
@@ -58,7 +72,7 @@ export default {
   },
   data() {
     return {
-      result: null,
+      result: '',
       email: '',
       password: '',
     }
@@ -106,11 +120,29 @@ export default {
         z.style.display = "block";
       }
     },
+    invalidEmail(){
+      return this.result.code == 1 && this.result.details[0].startsWith("Object didn't pass validation for format email:");
+    },
+    invalidPassword() {
+      return this.invalidNullPassword() || this.invalidLengthPassword();
+    },
+    invalidNullPassword() {
+      return this.result.code == 2 && this.result.details[0] == "NOT NULL constraint failed: User.password";
+    },
+    invalidLengthPassword() {
+      return this.result.code == 100 && this.result.details[0] == "Password has to be at least 8 chars long";
+    },
+    invalidConfirmPassword() {
+      return this.result.code == 100 && this.result.details[0] == "Confirm password does not match";
+    },
+    invalidEmailVerification() {
+      return this.result.code == 8 && this.result.details[0] == "Invalid verification code";
+    },
     setResult(result){
-      this.result = JSON.stringify(result, null, 2)
+      this.result = result
     },
     clearResult() {
-      this.result = null
+      this.result = ''
     },
     async signup() {
       try {
@@ -119,9 +151,16 @@ export default {
         this.email = document.getElementById('signupEmail').value;
         this.password = document.getElementById('firstPassword').value;
         const confirmPassword = document.getElementById('secondPassword').value;
-        if(this.password != confirmPassword) {
+        if(this.password.length < 8) {
+          const res = { 'code': 100, 'details': [ 'Password has to be at least 8 chars long']}
+          this.setResult(res);
           return;
-        } 
+        } else if(this.password != confirmPassword) {
+          const res = { 'code': 100, 'details': [ 'Confirm password does not match' ]}
+          this.setResult(res);
+          return;
+        }
+
         const credentials = new SignupCredentials(firstName, lastName, this.email, this.password);
         const url = `${Api.baseUrl}/users`;
 
@@ -170,6 +209,24 @@ export default {
         console.log(e);
       }
     },
+  },
+  watch: {
+    result: function () {
+      switch(true) {
+        case this.invalidEmail():
+          document.querySelector('#signupEmail').focus();
+          break;
+        case this.invalidPassword():
+          document.querySelector('#firstPassword').focus();
+          break;
+        case this.invalidConfirmPassword():
+          document.querySelector('#secondPassword').focus();
+          break;
+        case this.invalidEmailVerification():
+          document.querySelector('#verifyCode').focus();
+          break;
+      }
+    }
   }
 }
 </script>
@@ -339,5 +396,29 @@ export default {
       }
     }
 
+    .errorTextBox {
+      text-align: left;
+    }
+
+    .error{
+      border: 1px solid red !important;
+    }
+
+    .error:focus {
+      outline: none !important;
+      border: 2.5px solid red !important;
+    }
+
+    .errorText{
+      display: none;
+      color: red;
+      font-size: 14px;
+      margin-left: 3em;
+    }
+
+    .showError {
+      display: inline !important;
+      text-align: left !important;
+    }
   }
 </style>

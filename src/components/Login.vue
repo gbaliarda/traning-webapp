@@ -6,13 +6,18 @@
       <hr class="loginBar">
 
       <div class="formContent">
-        <input type="email" placeholder="email..." class="input" id="loginUser" />
-        
+        <input type="email" placeholder="Email..." class="input" id="loginUser" :class="{ 'error' : invalidUsername()}" />
+        <div class="errorTextBox">
+          <p class="errorText" :class="{ 'showError' : invalidUsername()}">Usuario invalido</p>
+        </div>
         <div class="passwordBox">
-          <input type="password" placeholder="contraseña..." class="input" id="loginPassword" />
+          <input type="password" placeholder="Contraseña..." class="input" id="loginPassword" :class="{ 'error' : invalidPassword()}" />
           <div @click="hideFirstEye">
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_1">mdi-eye</v-icon>
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_2">mdi-eye-off</v-icon>
+          </div>
+          <div class="errorTextBox">
+            <p class="errorText" :class="{ 'showError' : invalidPassword()}">Contraseña invalida</p>
           </div>
         </div>
         <a class="restrictionText">¿Olvidaste tu contraseña?</a>
@@ -25,7 +30,10 @@
     <div class="verifyLoginEmail">
       <h2 class="title">Verifica tu e-mail</h2>
       <hr>
-      <input type="text" placeholder="inserte el codigo..." class="input" id="verifyLoginCode" /> 
+      <input type="text" placeholder="Inserte el codigo..." class="input" id="verifyLoginCode" :class="{ 'error' : invalidEmailVerification()}" /> 
+      <div class="errorTextBox">
+        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
+      </div>
       <p class="resendEmail" @click="resendLoginEmail()">Reenviar e-mail de verifiacion</p>
       <input type="button" value="Verificar" @click="verifyLoginEmail()" class="verifyBtn" />
     </div>
@@ -47,7 +55,7 @@ export default {
   },
   data() {
     return {
-      result: null,
+      result: '',
       user: '',
       password: '',
     }
@@ -65,6 +73,15 @@ export default {
     ...mapActions('security', {
       $login: 'login',
     }),
+    invalidUsername() {
+      return this.result.code == 4 && this.result.details[0] === 'Username does not exist';
+    },
+    invalidPassword() {
+      return this.result.code == 4 && this.result.details[0] === 'Password does not match';
+    },
+    invalidEmailVerification() {
+      return this.result.code == 8 && this.result.details[0] == "Invalid verification code";
+    },
     hideFirstEye: function() {
       var x = document.getElementById("loginPassword");
       var y = document.getElementById("loginEyeBox1_2");
@@ -81,10 +98,10 @@ export default {
       }
     },
     setResult(result){
-      this.result = JSON.stringify(result, null, 2)
+      this.result = result
     },
     clearResult() {
-      this.result = null
+      this.result = ''
     },
     async login() {
       try {
@@ -139,6 +156,23 @@ export default {
         console.log(e);
       }
     },
+  },
+  watch: {
+    result: function (res) {
+      switch(res.code) {
+        case 4: {
+          switch(res.details[0]) {
+            case 'Username does not exist':
+              document.querySelector('#loginUser').focus();
+              break;
+            case 'Password does not match':
+              document.querySelector('#loginPassword').focus();
+              break;
+          }
+          break;
+        }
+      }
+    }
   }
 }
 </script>
@@ -155,6 +189,7 @@ export default {
     align-items: center;
     text-align: center;
     z-index: 2;
+
 
     .verifyLoginEmail {
       display: none;
@@ -326,5 +361,29 @@ export default {
       }
     }
 
+    .errorTextBox {
+      text-align: left;
+    }
+
+    .error{
+      border: 1px solid red !important;
+    }
+
+    .error:focus {
+      outline: none !important;
+      border: 2.5px solid red !important;
+    }
+
+    .errorText{
+      display: none;
+      color: red;
+      font-size: 14px;
+      margin-left: 3em;
+    }
+
+    .showError {
+      display: inline !important;
+      text-align: left !important;
+    }
   }
 </style>

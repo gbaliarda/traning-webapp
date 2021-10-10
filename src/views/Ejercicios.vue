@@ -1,19 +1,16 @@
 <template>
   <div class="container">
-    <div class="title">
-      <h1>Mis ejercicios</h1>
-      <v-icon class="icon" size="30">mdi-pencil</v-icon>
-    </div>
+    <h1>Mis ejercicios</h1>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
     <div :class="loading ? 'hidden' : 'ejercicios'">
-      <ExerciseCard v-for="ex in exercises" :key="ex.id" :titulo="ex.name" :grupo="ex.metadata.grupo" :dificultad="ex.metadata.dif" />
+      <ExerciseCard v-for="ex in exercises" :key="ex.id" :titulo="ex.name" :grupo="ex.metadata.grupo" :dificultad="ex.metadata.dif" :id="ex.id" :getterEx="getExercises" />
       <div @click="openModal">
         <AddButton />
       </div>
     </div>
     <Spinner :class="{'hidden': !loading}" />
-    <Modal title="Crear ejercicio">
-      <CreateExe :getterEx="getExercises" />
+    <Modal title="Crear ejercicio" :open="modalOpen" :closeMod="closeMod">
+      <CreateExe :getterEx="getExercises" :closeMod="closeMod" />
     </Modal>
   </div>
 </template>
@@ -42,11 +39,12 @@ export default {
         description: "",
       },
       loading: true,
+      modalOpen: false,
     }
   },
   methods: {
     openModal() {
-      this.$store.commit("setShowing", true);
+      this.modalOpen = true;
     },
     async getExercises() {
       const url = `${Api.baseUrl}/exercises`;
@@ -60,6 +58,9 @@ export default {
           this.error = e;
       }
       this.loading = false;
+    },
+    closeMod() {
+      this.modalOpen = false;
     }
   },
   created() {
@@ -84,18 +85,8 @@ export default {
       font-size: 1.2rem;
     }
 
-    .title {
-      display: flex;
-
-      h1 {
-        font-weight: 400;
-        margin-right: .8em;
-      }
-
-      .icon {
-        color: #DA611B;
-        cursor: pointer;
-      }
+    h1 {
+      font-weight: 400;
     }
     
     .ejercicios {

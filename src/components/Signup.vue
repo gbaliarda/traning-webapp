@@ -12,7 +12,10 @@
         </div>
         <input type="email" placeholder="Email" class="input" id="signupEmail" :class="{ 'error' : invalidEmail()}"/>
         <div class="errorTextBox">
-          <p class="errorText" :class="{ 'showError' : invalidEmail()}">Email invalido</p>
+          <p class="errorText" :class="{ 'showError' : invalidFormatEmail()}">El formato del email es invalido</p>
+        </div>
+        <div class="errorTextBox">
+          <p class="errorText" :class="{ 'showError' : invalidUniqueEmail()}">El mail ya esta asociado a una cuenta</p>
         </div>
         <div class="passwordBox">
           <input type="password" placeholder="Contraseña" class="input" id="firstPassword" :class="{ 'error' : invalidPassword()}"/>
@@ -137,7 +140,13 @@ export default {
       }
     },
     invalidEmail(){
+      return this.invalidFormatEmail() || this.invalidUniqueEmail();
+    },
+    invalidFormatEmail(){
       return this.result.code == 1 && this.result.details[0].startsWith("Object didn't pass validation for format email:");
+    },
+    invalidUniqueEmail(){
+      return this.result.code == 2 && this.result.details[0] == "UNIQUE constraint failed: User.email";
     },
     invalidPassword() {
       return this.invalidNullPassword() || this.invalidLengthPassword();

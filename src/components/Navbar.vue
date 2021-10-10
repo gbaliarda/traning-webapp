@@ -3,8 +3,8 @@
     <nav>
       <router-link to="/" class="logo">traning</router-link>
       <div class="links">
-        <router-link to="/">Inicio</router-link>
-        <a href="#herramientas" :hidden="$isLoggedIn">Herramientas</a>
+        <!-- <router-link to="/">Inicio</router-link> -->
+        <!-- <a href="#herramientas" :hidden="$isLoggedIn">Herramientas</a> -->
         <div class="loggedInBtns" :hidden="!$isLoggedIn">
           <router-link to="/perfil">Perfil</router-link>
           <router-link to="/ejercicios">Ejercicios</router-link>
@@ -90,6 +90,10 @@ export default {
 <style scoped lang="scss">
   [hidden] { display: none !important; }
 
+  .router-link-exact-active {
+    color: #DA611B;
+  }
+
   nav {
     display: flex;
     width: 90%;
@@ -104,6 +108,7 @@ export default {
 
     .logo {
       font-size: 1.6em;
+      color: #000 !important;
     }
 
     .links {

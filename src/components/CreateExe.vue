@@ -18,9 +18,18 @@
     <div class="arrow-dif"></div>
     <textarea placeholder="Descripción" cols="30" rows="10" v-model="desc"></textarea>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
-    <Button v-if="!loading" text="Guardar" />
-    <div v-else class="loadingBtn">
-      <Spinner />
+    <div class="buttons">
+      <Button v-if="!loading" text="Guardar" />
+      <div v-else class="loadingBtn">
+        <Spinner />
+      </div>
+      <div v-if="this.id" @mouseenter="displayTooltip" @mouseleave="displayTooltip" @click="deleteExercise">
+        <Button v-if="!loading" text="Eliminar"  class="delete" />
+        <div v-else class="loadingBtn">
+          <Spinner />
+        </div>
+        <div v-if="!loading" :class="tooltip ? 'tooltip' : 'hidden'">Si elimina el ejercicio,<br> se perderá para siempre</div>
+      </div>
     </div>
   </form>
 </template>
@@ -36,6 +45,9 @@ export default {
     Button,
     Spinner,
   },
+  props: {
+    id: String,
+  },
   data() {
     return {
       nombre: "",
@@ -46,6 +58,24 @@ export default {
         description: ''
       },
       loading: false,
+      tooltip: false,
+    }
+  },
+  async created() {
+    if (!this.id)
+      return;
+    const url = `${Api.baseUrl}/exercises/${this.id}`;
+    try {
+      const res = await Api.get(url, true);
+      this.nombre = res.name;
+      this.grupo = res.metadata.grupo;
+      this.dif = res.metadata.dif;
+      this.desc = res.detail;
+    } catch(e) {
+      if (e.code == 99)
+        this.error.description = "Error al cargar ejercicio";
+      else
+        this.error = e;
     }
   },
   methods: {
@@ -71,7 +101,12 @@ export default {
       const url = `${Api.baseUrl}/exercises`;
       this.loading = true;
       try {
-        await Api.post(url, true, payload);
+        if (this.id)
+          await Api.post(url, true, payload);
+        else {
+          payload.id = this.id;
+          await Api.put(url, true, payload);
+        }
         this.error = null;
       } catch(e) {
         if (e.code == 99)
@@ -80,6 +115,24 @@ export default {
           this.error = e;
       }
       this.loading = false;
+    },
+    async deleteExercise(e) {
+      e.preventDefault();
+      const url = `${Api.baseUrl}/exercises/${this.id}`;
+      this.loading = true;
+      try {
+        await Api.delete(url, true);
+        this.error = null;
+      } catch(e) {
+        if (e.code == 99)
+          this.error.description = "Error al eliminar ejercicio";
+        else
+          this.error = e;
+      }
+      this.loading = false;
+    },
+    displayTooltip() {
+      this.tooltip = !this.tooltip;
     }
   }
 };
@@ -113,6 +166,43 @@ export default {
     height: 38px;
     // height: 58px;
     border-radius: 10px;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .delete {
+      background: #fff;
+      border: 1px solid #DA611B;
+      color: #DA611B;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .tooltip {
+      position: absolute;
+      right: 10px;
+      bottom: 100px;
+      background: tomato;
+      color: #fff;
+      text-align: center;
+      padding: 1em;
+      border-radius: 10px;
+      pointer-events: none;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 10px;
+        border-style: solid;
+        border-color: tomato transparent transparent transparent;
+      }
+    }
   }
 }
 

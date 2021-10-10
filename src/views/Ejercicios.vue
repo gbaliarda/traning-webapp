@@ -3,14 +3,14 @@
     <h1>Mis ejercicios</h1>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
     <div :class="loading ? 'hidden' : 'ejercicios'">
-      <ExerciseCard v-for="ex in exercises" :key="ex.id" :titulo="ex.name" :grupo="ex.metadata.grupo" :dificultad="ex.metadata.dif" :id="ex.id" />
+      <ExerciseCard v-for="ex in exercises" :key="ex.id" :titulo="ex.name" :grupo="ex.metadata.grupo" :dificultad="ex.metadata.dif" :id="ex.id" :getterEx="getExercises" />
       <div @click="openModal">
         <AddButton />
       </div>
     </div>
     <Spinner :class="{'hidden': !loading}" />
     <Modal title="Crear ejercicio" :open="modalOpen" :closeMod="closeMod">
-      <CreateExe :getterEx="getExercises" />
+      <CreateExe :getterEx="getExercises" :closeMod="closeMod" />
     </Modal>
   </div>
 </template>

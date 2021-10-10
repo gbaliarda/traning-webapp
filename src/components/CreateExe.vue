@@ -1,7 +1,9 @@
 <template>
   <form @submit="handleSubmit" class="createExe">
-    <input v-model="nombre" required placeholder="Nombre" type="text">
-    <select required v-model="grupo">
+    <v-icon v-if="this.id && !editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-pencil</v-icon>
+    <v-icon v-else-if="this.id && editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-close</v-icon>
+    <input v-model="nombre" required placeholder="Nombre" type="text" :disabled="!editing">
+    <select required v-model="grupo" :disabled="!editing">
       <option disabled>Grupo Muscular</option>
       <option>Piernas</option>
       <option>Brazos</option>
@@ -9,22 +11,22 @@
       <option>Hombros</option>
     </select>
     <div class="arrow-grp"></div>
-    <select required v-model="dif">
+    <select required v-model="dif" :disabled="!editing">
       <option disabled>Dificultad</option>
       <option>Principiante</option>
       <option>Intermedia</option>
       <option>Avanzada</option>
     </select>
     <div class="arrow-dif"></div>
-    <textarea placeholder="Descripción" cols="30" rows="10" v-model="desc"></textarea>
+    <textarea placeholder="Descripción" cols="30" rows="10" v-model="desc" :disabled="!editing"></textarea>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
     <div class="buttons">
-      <Button v-if="!loading" text="Guardar" />
+      <Button v-if="!loading" text="Guardar" class="btn" :class="{ disabled: !editing }" />
       <div v-else class="loadingBtn">
         <Spinner />
       </div>
       <div v-if="this.id" @mouseenter="displayTooltip" @mouseleave="displayTooltip" @click="deleteExercise">
-        <Button v-if="!loading" text="Eliminar"  class="delete" />
+        <Button v-if="!loading" text="Eliminar"  class="delete btn" />
         <div v-else class="loadingBtn">
           <Spinner />
         </div>
@@ -47,7 +49,8 @@ export default {
   },
   props: {
     getterEx: Function,
-    id: String,
+    id: Number,
+    closeMod: Function,
   },
   data() {
     return {
@@ -60,11 +63,14 @@ export default {
       },
       loading: false,
       tooltip: false,
+      editing: false,
     }
   },
   async created() {
-    if (!this.id)
+    if (!this.id) {
+      this.editing = true;
       return;
+    }
     const url = `${Api.baseUrl}/exercises/${this.id}`;
     try {
       const res = await Api.get(url, true);
@@ -90,6 +96,10 @@ export default {
         this.error.description = "Seleccione la dificultad";
         return;
       }
+      if (this.nombre.length > 20) {
+        this.error.description = "El nombre es demasiado largo";
+        return;
+      }
       const payload = {
         name: this.nombre,
         detail: this.desc,
@@ -102,18 +112,18 @@ export default {
       const url = `${Api.baseUrl}/exercises`;
       this.loading = true;
       try {
-        if (this.id) {
+        if (!this.id)
           await Api.post(url, true, payload);
-          this.getterEx();
-        }
-        else {
-          payload.id = this.id;
-          await Api.put(url, true, payload);
-        }
+        else
+          await Api.put(url+`/${this.id}`, true, payload);
+        this.getterEx();
+        this.closeMod();
         this.error = {};
       } catch(e) {
         if (e.code == 99)
           this.error.description = "Error al guardar ejercicio";
+        else if (e.description === "Data constraint")
+          this.error.description = "Nombre de ejercicio repetido";
         else
           this.error = e;
       }
@@ -125,7 +135,9 @@ export default {
       this.loading = true;
       try {
         await Api.delete(url, true);
-        this.error = null;
+        this.error = {};
+        this.getterEx();
+        this.closeMod();
       } catch(e) {
         if (e.code == 99)
           this.error.description = "Error al eliminar ejercicio";
@@ -136,6 +148,9 @@ export default {
     },
     displayTooltip() {
       this.tooltip = !this.tooltip;
+    },
+    toggleEditing() {
+      this.editing = !this.editing;
     }
   }
 };
@@ -153,8 +168,25 @@ export default {
     display: none;
   }
 
-  button {
+  .btn {
     padding: .6em 2em;
+  }
+
+  .disabled {
+    background: #bbb;
+    pointer-events: none;
+  }
+
+  .icon-edit {
+    color: #DA611B;
+    position: absolute;
+    top: 9%;
+    left: 62%;
+    cursor: pointer;
+  }
+
+  .icon-edit::after {
+    background: none;
   }
 
   .error {

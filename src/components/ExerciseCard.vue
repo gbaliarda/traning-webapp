@@ -6,8 +6,8 @@
       <p>Dificultad: {{ dificultad }}</p>
     </div>
     <button @click="openModal">Detalles</button>
-    <Modal title="Editar ejercicio" :open="modalOpen" :closeMod="closeMod">
-      <CreateExe :id="id" />
+    <Modal title="Detalles" :open="modalOpen" :closeMod="closeMod">
+      <CreateExe :id="id" :closeMod="closeMod" :getterEx="getterEx" />
     </Modal>
   </div>
 </template>
@@ -31,7 +31,8 @@ export default {
     titulo: String,
     grupo: String,
     dificultad: String,
-    id: String,
+    id: Number,
+    getterEx: Function,
   },
   methods: {
     openModal() {

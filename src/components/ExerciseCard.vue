@@ -52,6 +52,7 @@ export default {
     height: 250px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     justify-content: space-between;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;

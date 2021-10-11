@@ -5,8 +5,7 @@
       <v-icon class="icon" size="30">mdi-pencil</v-icon>
     </div>
     <div class="rutinas">
-      <RoutineCard titulo="Piernas" duracion="30 minutos" dificultad="avanzada" />
-      <RoutineCard titulo="Brazos" duracion="30 minutos" dificultad="avanzada" />
+      <RoutineCard v-for="rutina in rutinas" :key="rutina.id" :titulo="rutina.name" :dificultad="rutina.difficulty" />
       <router-link to="/crear-rutina">
         <AddButton />
       </router-link>
@@ -17,13 +16,38 @@
 <script>
 import RoutineCard from "../components/RoutineCard.vue"
 import AddButton from "../components/micro-components/AddButton.vue"
+import {Rutina} from "../../api/rutinas";
+import {mapState, mapGetters, mapActions} from 'vuex'
 
 export default {
   name: "Rutinas",
   components: {
     RoutineCard,
     AddButton,
-  }
+  },
+  data(){
+    return{
+      rutinas: []
+    }
+  },
+  methods: {
+    ...mapActions('rutinas', {
+      $deleteRutina: 'delete',
+      $getRutina: 'get',
+      $getAllRutinas: 'getAll'
+    })
+  },
+  mounted() {
+    this.$nextTick(async () => {
+      try {
+        this.rutinas = (await this.$getAllRutinas()).content;
+        console.log(this.rutinas);
+      }
+      catch(err) {
+        console.log(err);
+      }
+    })
+  } 
 };
 </script>
 

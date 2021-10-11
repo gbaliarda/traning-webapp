@@ -1,5 +1,5 @@
 <template>
-  <div class="add-btn">
+  <div @click="$emit('click')" class="add-btn">
     <span class="vertical"></span>
     <span class="horizontal"></span>
   </div>
@@ -22,6 +22,7 @@
     display: grid;
     place-items: center;
     cursor: pointer;
+    flex-shrink: 0;
 
     .vertical {
       height: 123px;

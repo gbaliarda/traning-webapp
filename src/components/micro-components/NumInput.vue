@@ -21,11 +21,13 @@
     methods: {
       counterUp() {
         this.num++;
+        this.$emit('input', this.num);
       },
       counterDown() {
         if (this.num == 0)
           return;
         this.num--;
+        this.$emit('input', this.num);
       },
     }
   };
@@ -34,6 +36,8 @@
 <style scoped lang="scss">
   .num-input {
     display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
     justify-content: space-between;
     position: relative;
 

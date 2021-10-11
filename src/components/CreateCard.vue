@@ -1,9 +1,8 @@
 <template>
-  <div class="ejercicio">
+  <div class="ejercicio" :style="cssVars">
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
-      <NumInput text="Repeticiones" />
-      <NumInput text="Series" />
+      <NumInput v-model="repetitions" text="Repeticiones" />
     </div>
     <div class="buttons">
       <button>Detalles</button>
@@ -22,7 +21,29 @@ export default {
   },
   props: {
     titulo: String,
+    marginRight: {
+      type: String,
+      default: "3em"
+    },
+    marginBottom: {
+      type: String,
+      default: "2em"
+    }
+  },
+  data() {
+    return {
+      repetitions: 0
+    }
+  },
+  computed: {
+    cssVars() {
+      return {
+        '--margin-right': this.marginRight,
+        '--margin-bottom': this.marginBottom
+      }
+    }
   }
+
 };
 </script>
 
@@ -33,11 +54,12 @@ export default {
     height: 250px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     justify-content: space-between;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    margin-right: 3em;
-    margin-bottom: 2em;
+    margin-right: var(--margin-right);
+    margin-bottom: var(--margin-bottom);
 
     .card-title {
       font-size: 1.4em;

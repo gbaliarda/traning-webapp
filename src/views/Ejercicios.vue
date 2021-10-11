@@ -48,8 +48,22 @@ export default {
     openModal() {
       this.$store.commit("setShowing", true);
     },
+    async getExAmount() {
+      const url = `${Api.baseUrl}/exercises?size=1`;
+      try {
+        const res = await Api.get(url, true);
+        return res.totalCount;
+      } catch(e) {
+        if (e.code == 99)
+          this.error.description = "Error al cargar ejercicios";
+        else
+          this.error = e;
+      }
+      return 10;
+    },
     async getExercises() {
-      const url = `${Api.baseUrl}/exercises`;
+      const totalExercises = await this.getExAmount();
+      const url = `${Api.baseUrl}/exercises?size=${totalExercises}`;
       try {
         const res = await Api.get(url, true);
         this.exercises = res.content;
@@ -60,7 +74,7 @@ export default {
           this.error = e;
       }
       this.loading = false;
-    }
+    },
   },
   created() {
     this.getExercises();

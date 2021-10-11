@@ -5,18 +5,43 @@
       <p>Grupo: {{ grupo }}</p>
       <p>Dificultad: {{ dificultad }}</p>
     </div>
-    <button>Detalles</button>
+    <button @click="openModal">Detalles</button>
+    <Modal title="Detalles" :open="modalOpen" :closeMod="closeMod">
+      <CreateExe :id="id" :closeMod="closeMod" :getterEx="getterEx" />
+    </Modal>
   </div>
 </template>
 
 <script>
+import Modal from "./Modal.vue"
+import CreateExe from "./CreateExe.vue"
+
 export default {
   name: "ExerciseCard",
+  components: {
+    Modal,
+    CreateExe,
+  },
+  data() {
+    return {
+      modalOpen: false
+    }
+  },
   props: {
     titulo: String,
     grupo: String,
     dificultad: String,
-  }
+    id: Number,
+    getterEx: Function,
+  },
+  methods: {
+    openModal() {
+      this.modalOpen = true;
+    },
+    closeMod() {
+      this.modalOpen = false;
+    }
+  },
 };
 </script>
 

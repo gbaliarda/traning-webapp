@@ -6,12 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    showing: false
   },
   mutations: {
-    setShowing(state, showing) {
-      state.showing = showing;
-    }
   },
   actions: {
   },

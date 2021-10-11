@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:class="{root: this.$store.state.showing, hidden: !this.$store.state.showing}">
+  <div v-bind:class="{root: open, hidden: !open}">
     <div class="box">
       <v-icon class="closeBtn" size="30" @click="closeModal">mdi-close</v-icon>
       <h3>{{ title }}</h3>
@@ -13,11 +13,13 @@
 export default {
   name: "Modal",
   props: {
-    title: String
+    title: String,
+    open: Boolean,
+    closeMod: Function
   },
   methods: {
     closeModal() {
-      this.$store.commit("setShowing", false);
+      this.closeMod();
     }
   }
 };
@@ -32,6 +34,7 @@ export default {
   width: 100%;
   height: 100vh;
   place-items: center;
+  z-index: 2;
 }
 
 .hidden {

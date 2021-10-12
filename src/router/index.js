@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import Ejercicios from "../views/Ejercicios.vue";
 import Rutinas from "../views/Rutinas.vue";
 import CrearRutina from "../views/CrearRutina.vue";
+import EditarRutina from "../views/EditarRutina.vue";
 import Perfil from "../views/Perfil.vue";
 import P404 from "../views/P404.vue";
 import store from "../store";
@@ -39,6 +40,15 @@ const routes = [
       requiresAuth: true,
     },
     component: CrearRutina,
+  },
+  {
+    path: "/editar-rutina/:id",
+    name: "EditarRutina",
+    meta: {
+      requiresAuth: true
+    },
+    props: true,
+    component: EditarRutina
   },
   {
     path: "/perfil",

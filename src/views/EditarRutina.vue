@@ -4,28 +4,29 @@
       <router-link to="/rutinas">
         <v-icon class="icon" size="30">mdi-arrow-left</v-icon>
       </router-link>
-      <h1>Crear rutina</h1>
+      <h1>Editar rutina</h1>
     </div>
-    <div class="inputs">
-      <div class="input">
-        <p>Nombre</p>
-        <input v-model="name" type="text">
+    <div v-if="!loading">
+      <div class="inputs">
+        <div class="input">
+          <p>Nombre</p>
+          <input v-model="name" type="text">
+        </div>
+        <div class="input">
+          <p>Dificultad</p>
+          <select v-model="difficulty">
+            <option value="beginner">Principiante</option>
+            <option value="intermediate">Intermedio</option>
+            <option value="advanced">Avanzado</option>
+          </select>
+        </div>
       </div>
-      <div class="input">
-        <p>Dificultad</p>
-        <!-- Reemplazar por select -->
-        <select v-model="difficulty">
-          <option value="beginner">Principiante</option>
-          <option value="intermediate">Intermedio</option>
-          <option value="advanced">Avanzado</option>
-        </select>
-      </div>
+      <RoutineCycle ref="cicloCalentamiento" title="Ciclo Calentamiento" />
+      <RoutineCycle v-for="(n, index) in cycles" ref="cicloEjercicio" :key="n" :title="`Ciclo Ejercicio ${index+1}`" @delete="removeCycle(index)" deleteable/>
+      <AddButton @click="newCycle" class="add-cycle-button"/>
+      <RoutineCycle ref="cicloEnfriamiento" title="Ciclo Enfriamiento" />
+      <Button @click="createRutina" text="Guardar" />
     </div>
-    <RoutineCycle ref="cicloCalentamiento" title="Ciclo Calentamiento" />
-    <RoutineCycle v-for="(n, index) in cycles" ref="cicloEjercicio" :key="n" :title="`Ciclo Ejercicio ${index+1}`" @delete="removeCycle(index)" deleteable/>
-    <AddButton @click="newCycle" class="add-cycle-button"/>
-    <RoutineCycle ref="cicloEnfriamiento" title="Ciclo Enfriamiento" />
-    <Button @click="createRutina" text="Guardar" />
   </div>
 </template>
 
@@ -37,15 +38,19 @@ import RoutineCycle from "../components/RoutineCycle.vue"
 import Modal from "../components/Modal.vue"
 
 export default {
-  name: "CrearRutina",
+  name: "EditarRutina",
   components: {
     Button,
     AddButton,
     RoutineCycle,
     Modal
   },
+  props: {
+    id: Number
+  },
   data() {
     return {
+      loading: true,
       name: '',
       detail: 'asdfasdfasdf',
       difficulty: '',

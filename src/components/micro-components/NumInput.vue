@@ -15,7 +15,7 @@
     },
     data() {
       return {
-        num: 0,
+        num: 1,
       }
     },
     methods: {
@@ -24,7 +24,7 @@
         this.$emit('input', this.num);
       },
       counterDown() {
-        if (this.num == 0)
+        if (this.num == 1)
           return;
         this.num--;
         this.$emit('input', this.num);

@@ -16,20 +16,12 @@
 </template>
 
 <script>
-import ExerciseCard from "../components/ExerciseCard.vue"
-import AddButton from "../components/micro-components/AddButton.vue"
-import Modal from "../components/Modal.vue"
-import CreateExe from "../components/CreateExe.vue"
 import Spinner from "../components/micro-components/Spinner.vue"
 import { Api } from "../../api/api"
 
 export default {
   name: "ChooseExerciseModal",
   components: {
-    ExerciseCard,
-    AddButton,
-    Modal,
-    CreateExe,
     Spinner,
   },
   data() {

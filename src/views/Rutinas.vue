@@ -2,50 +2,74 @@
   <div class="container">
     <div class="title">
       <h1>Mis rutinas</h1>
-      <v-icon class="icon" size="30">mdi-pencil</v-icon>
     </div>
     <div class="rutinas">
-      <RoutineCard v-for="rutina in rutinas" :key="rutina.id" :titulo="rutina.name" :dificultad="rutina.difficulty" />
+      <RoutineCard 
+        v-for="routine in routines"
+        :key="routine.id"
+        :titulo="routine.name"
+        :dificultad="routine.difficulty"
+        @details="openModal(routine.id)"
+      />
       <router-link to="/crear-rutina">
         <AddButton />
       </router-link>
     </div>
+    <ViewRoutineModal ref="modal"/>
   </div>
 </template>
 
 <script>
 import RoutineCard from "../components/RoutineCard.vue"
 import AddButton from "../components/micro-components/AddButton.vue"
-import {Rutina} from "../../api/rutinas";
-import {mapState, mapGetters, mapActions} from 'vuex'
+import ViewRoutineModal from "../components/ViewRoutineModal.vue";
+import { Api } from "../../api/api";
 
 export default {
   name: "Rutinas",
   components: {
     RoutineCard,
     AddButton,
+    ViewRoutineModal
   },
   data(){
     return{
-      rutinas: []
+      routines: []
     }
   },
   methods: {
-    ...mapActions('rutinas', {
-      $deleteRutina: 'delete',
-      $getRutina: 'get',
-      $getAllRutinas: 'getAll'
-    })
+    async getRoutines() {
+      let url = `${Api.baseUrl}/routines`;
+      try {
+        const res = await Api.get(url, true);
+        this.routines = res.content;
+      } catch (e) {
+        console.log(`Error al obtener rutinas: ${e}`);
+        return;
+      }
+
+      const diffMap = {
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      }
+
+      this.routines = this.routines.map((routine) => {
+        routine.difficulty = diffMap[routine.difficulty];
+        return routine;
+      })
+      
+    },
+    openModal(routineID) {
+      this.$refs.modal.open(routineID);
+    },
+    closeModal() {
+      this.$refs.modal.close();
+    }
   },
   mounted() {
     this.$nextTick(async () => {
-      try {
-        this.rutinas = (await this.$getAllRutinas()).content;
-        console.log(this.rutinas);
-      }
-      catch(err) {
-        console.log(err);
-      }
+      this.getRoutines();
     })
   } 
 };

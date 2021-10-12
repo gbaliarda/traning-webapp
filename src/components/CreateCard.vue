@@ -32,7 +32,7 @@ export default {
   },
   data() {
     return {
-      repetitions: 0
+      repetitions: 1
     }
   },
   computed: {

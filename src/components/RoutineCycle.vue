@@ -28,7 +28,7 @@ export default {
     name: "RoutineCycle",
     data() {
         return {
-            repetitions: 0,
+            repetitions: 1,
             modalOpen: false,
             exercises: []
         }

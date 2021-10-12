@@ -9,7 +9,15 @@
             <NumInput v-model="repetitions" class="input" text="Repeticiones"/>
         </div>
         <div class="row">
-            <CreateCard v-for="ex in exercises" ref="exercise" :key="ex.id" :titulo="ex.name" />
+            <CreateCard 
+              v-for="(ex,index) in exercises"
+              ref="exercise"
+              :key="ex.id"
+              :id="ex.id"
+              :titulo="ex.name"
+              :startRepetitions="ex.repetitions"
+              @delete="exercises.splice(index,1)"
+            />
             <AddButton @click="modalOpen = true" class="add-button"/>
         </div>
         <v-icon v-if="deleteable" @click="$emit('delete')" class="icon" size="30">mdi-delete</v-icon>
@@ -29,8 +37,8 @@ export default {
     data() {
         return {
             repetitions: 1,
-            modalOpen: false,
-            exercises: []
+            exercises: [],
+            modalOpen: false
         }
     },
     components: {

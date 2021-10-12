@@ -10,7 +10,7 @@
       <div class="inputs">
         <div class="input">
           <p>Nombre</p>
-          <input v-model="name" type="text">
+          <input v-model="name" type="text" />
         </div>
         <div class="input">
           <p>Dificultad</p>
@@ -22,20 +22,28 @@
         </div>
       </div>
       <RoutineCycle ref="cicloCalentamiento" title="Ciclo Calentamiento" />
-      <RoutineCycle v-for="(n, index) in cycles" ref="cicloEjercicio" :key="n" :title="`Ciclo Ejercicio ${index+1}`" @delete="removeCycle(index)" deleteable/>
-      <AddButton @click="newCycle" class="add-cycle-button"/>
+      <div v-for="(cycle, index) in cycles" :key="cycle.id">
+        <RoutineCycle
+        v-if="index != 0 && index != cycles.length - 1"
+        ref="cicloEjercicio"
+        :title="`Ciclo Ejercicio ${index}`"
+        @delete="removeCycle(index)"
+        deleteable
+      />
+      </div>
+      <AddButton @click="newCycle" class="add-cycle-button" />
       <RoutineCycle ref="cicloEnfriamiento" title="Ciclo Enfriamiento" />
-      <Button @click="createRutina" text="Guardar" />
+      <Button @click="editRoutine" text="Guardar" />
     </div>
   </div>
 </template>
 
 <script>
-import Button from "../components/micro-components/Button.vue"
-import { Api } from "../../api/api"
-import AddButton from "../components/micro-components/AddButton.vue"
-import RoutineCycle from "../components/RoutineCycle.vue"
-import Modal from "../components/Modal.vue"
+import Button from "../components/micro-components/Button.vue";
+import { Api } from "../../api/api";
+import AddButton from "../components/micro-components/AddButton.vue";
+import RoutineCycle from "../components/RoutineCycle.vue";
+import Modal from "../components/Modal.vue";
 
 export default {
   name: "EditarRutina",
@@ -43,22 +51,22 @@ export default {
     Button,
     AddButton,
     RoutineCycle,
-    Modal
+    Modal,
   },
   props: {
-    id: Number
+    id: String,
   },
   data() {
     return {
       loading: true,
-      name: '',
-      detail: 'asdfasdfasdf',
-      difficulty: '',
+      name: "",
+      detail: "",
+      difficulty: "",
       cycleID: 0,
       cycles: [],
       modalOpen: true,
-      repeticiones: 0
-    }
+      repeticiones: 0,
+    };
   },
   methods: {
     newCycle() {
@@ -66,87 +74,89 @@ export default {
       console.log(this.cycles);
     },
     removeCycle(index) {
-      this.cycles.splice(index,1);
+      this.cycles.splice(index, 1);
       console.log(this.cycles);
     },
-    async createRutina() {
+    async editRoutine() {
       let name = this.name;
       let detail = this.detail;
       let isPublic = true;
       let difficulty = this.difficulty;
 
       let error = false;
-      if(name == "") {
+      if (name == "") {
         console.log("Error: Nombre vacío");
         error = true;
       }
 
-      if(detail == "") {
+      if (detail == "") {
         console.log("Error: Descripción vacía");
         error = true;
       }
 
-      if(difficulty == "") {
+      if (difficulty == "") {
         console.log("Error: dificultad vacía");
         error = true;
       }
 
-      if(error) return;
+      if (error) return;
 
       //Post Rutina
       let rutina = {
         name,
         detail,
         isPublic,
-        difficulty
-      }
+        difficulty,
+      };
+
       let routineID;
-      const url = `${Api.baseUrl}/routines`;
       try {
-        const res = await Api.post(url, true, rutina);
+        const deleteUrl = `${Api.baseUrl}/routines/${this.id}`;
+        const postUrl = `${Api.baseUrl}/routines`;
+        await Api.delete(deleteUrl, true);
+        const res = await Api.post(postUrl, true, rutina);
         routineID = res.id;
-      } catch(e) {
+      } catch (e) {
         console.log(e);
         return;
       }
 
       let cycles = [
         {
-          id: null,
           name: this.$refs.cicloCalentamiento.title,
           type: "warmup",
           repetitions: this.$refs.cicloCalentamiento.repetitions,
           order: 1,
           detail: "",
-          exercises: this.$refs.cicloCalentamiento.apiExercises
-        }
-      ]
+          exercises: this.$refs.cicloCalentamiento.apiExercises,
+        },
+      ];
 
-      if(this.$refs.cicloEjercicio) {
+      if (this.$refs.cicloEjercicio) {
         this.$refs.cicloEjercicio.forEach((ciclo, index) => {
           cycles.push({
-            id: null,
             name: ciclo.title,
             type: "exercise",
             repetitions: ciclo.repetitions,
             order: index + 2,
             detail: "",
-            exercises: ciclo.apiExercises
-          })
-        })
+            exercises: ciclo.apiExercises,
+          });
+        });
       }
 
-      let exCount = this.$refs.cicloEjercicio ? this.$refs.cicloEjercicio.length : 0;
+      let exCount = this.$refs.cicloEjercicio
+        ? this.$refs.cicloEjercicio.length
+        : 0;
 
       cycles.push({
-        id: null,
         name: this.$refs.cicloEnfriamiento.title,
         type: "cooldown",
         repetitions: this.$refs.cicloEnfriamiento.repetitions,
         order: exCount + 2,
         detail: "",
-        exercises: this.$refs.cicloEnfriamiento.apiExercises
-      })
+        exercises: this.$refs.cicloEnfriamiento.apiExercises,
+      });
 
       cycles.forEach(async (cycle, index) => {
         const url = `${Api.baseUrl}/routines/${routineID}/cycles`;
@@ -157,10 +167,10 @@ export default {
             detail: cycle.detail,
             repetitions: cycle.repetitions,
             order: cycle.order,
-            type: cycle.type
+            type: cycle.type,
           });
           id = res.id;
-        } catch(e) {
+        } catch (e) {
           console.log(e);
           return;
         }
@@ -169,75 +179,136 @@ export default {
           const url = `${Api.baseUrl}/cycles/${id}/exercises/${exercise.id}`;
           try {
             const res = await Api.post(url, true, {
-              order: index+1,
+              order: index + 1,
               repetitions: exercise.repetitions,
-              duration:0
+              duration: 0,
             });
-          } catch(e) {
+          } catch (e) {
             console.log(e);
             return;
           }
-        })
+        });
       });
-      
+
       this.$router.go(-1);
+    },
+  },
+  async created() {
+    this.loading = true;
+
+    //Rutina
+    let routine;
+    let url = `${Api.baseUrl}/routines/${this.id}`;
+    try {
+      const res = await Api.get(url, true);
+      routine = res;
+    } catch (e) {
+      if (e.code == 99) this.error.description = "Error al cargar rutina";
+      else this.error = e;
+      return;
     }
-  }
+
+    this.difficulty = routine.difficulty;
+    this.name = routine.name;
+    this.detail = routine.detail;
+
+    //Ciclos
+    url = `${Api.baseUrl}/routines/${this.id}/cycles`;
+    try {
+      const res = await Api.get(url, true);
+      this.cycles = res.content.sort((a, b) => a.order - b.order);
+    } catch (e) {
+      if (e.code == 99) this.error.description = "Error al cargar ciclos";
+      else this.error = e;
+      return;
+    }
+
+    //Ejercicios
+    this.cycles.forEach(async (cycle, index) => {
+      url = `${Api.baseUrl}/cycles/${cycle.id}/exercises`;
+      try {
+        const res = await Api.get(url, true);
+        let exercises = res.content.sort((a, b) => a.order - b.order).map((e) => {
+          let newEx = e.exercise;
+          newEx.repetitions = e.repetitions;
+          return newEx;
+        });
+
+        if(index == 0) {
+          this.$refs.cicloCalentamiento.exercises = exercises;
+          this.$refs.cicloCalentamiento.repetitions = cycle.repetitions;
+        }
+        else if(index == this.cycles.length - 1) {
+          this.$refs.cicloEnfriamiento.exercises = exercises;
+          this.$refs.cicloEnfriamiento.repetitions = cycle.repetitions;
+        }
+        else {
+          this.$refs.cicloEjercicio[index-1].exercises = exercises;
+          this.$refs.cicloEjercicio[index-1].repetitions = cycle.repetitions;
+        }
+      } catch (e) {
+        if (e.code == 99) this.error.description = "Error al cargar ejercicios";
+        else this.error = e;
+        return;
+      }
+    });
+    this.loading = false;
+  },
 };
 </script>
 
 <style scoped lang="scss">
-  .container {
-    width: 80%;
-    margin: auto;
-    margin-top: 4em;
+.container {
+  width: 80%;
+  margin: auto;
+  margin-top: 4em;
 
-    .add-cycle-button {
-      margin-bottom: 48px;
-      width: 100%;
-    }
-
-    p {
-      font-size: 1.4em;
-      margin-bottom: 1em;
-    }
-
-    .title {
-      display: flex;
-
-      h1 {
-        font-weight: 400;
-      }
-
-      .icon {
-        color: #DA611B;
-        cursor: pointer;
-        position: absolute;
-        margin-left: -2em;
-        margin-top: .15em;
-      }
-    }
-
-    .inputs {
-      margin-top: 3em;
-      width: 80%;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-
-      .input {
-        width: 45%;
-        margin-bottom: 2em;
-        
-        input,select {
-          width: 100%;
-          border: 1px solid #BFBFBF;
-          border-radius: 10px;
-          padding: .7em 1em;
-          outline: none;
-        }
-      }
-    }
-    
+  .add-cycle-button {
+    margin-bottom: 48px;
+    width: 100%;
   }
+
+  p {
+    font-size: 1.4em;
+    margin-bottom: 1em;
+  }
+
+  .title {
+    display: flex;
+
+    h1 {
+      font-weight: 400;
+    }
+
+    .icon {
+      color: #da611b;
+      cursor: pointer;
+      position: absolute;
+      margin-left: -2em;
+      margin-top: 0.15em;
+    }
+  }
+
+  .inputs {
+    margin-top: 3em;
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    .input {
+      width: 45%;
+      margin-bottom: 2em;
+
+      input,
+      select {
+        width: 100%;
+        border: 1px solid #bfbfbf;
+        border-radius: 10px;
+        padding: 0.7em 1em;
+        outline: none;
+      }
+    }
+  }
+}
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="num-input">
     <span>{{ text }}</span>
-    <span class="counter">{{ num }}</span>
+    <span class="counter">{{ value }}</span>
     <div class="arrow-up" @click="counterUp"></div>
     <div class="arrow-down" @click="counterDown"></div>
   </div>
@@ -11,23 +11,17 @@
   export default {
     name: "NumInput",
     props: {
-      text: String
-    },
-    data() {
-      return {
-        num: 1,
-      }
+      text: String,
+      value: Number
     },
     methods: {
       counterUp() {
-        this.num++;
-        this.$emit('input', this.num);
+        this.$emit('input', this.value+1);
       },
       counterDown() {
-        if (this.num == 1)
+        if (this.value == 1)
           return;
-        this.num--;
-        this.$emit('input', this.num);
+        this.$emit('input', this.value-1);
       },
     }
   };

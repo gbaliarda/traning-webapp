@@ -4,7 +4,7 @@
       <p v-if="error.description != ''" class="error">
         {{ error.description }}
       </p>
-      <div v-if="!loading" class="rutina">
+      <div v-if="!loading && routine" class="rutina">
           <h1>{{ routine.name }}</h1>
           <div class="descripcion">
             <p>Detalles: {{ routine.detail }}</p>
@@ -13,11 +13,19 @@
           <div class="cycle" v-for="cycle in cycles" :key="cycle.id">
             <p>{{cycle.name}}</p>
             <div class="exercises">
-              <CreateCard v-for="ex in cycleExercises(cycle.id)" :key="ex.order" :titulo="ex.name" />
+              <ExerciseCard 
+                v-for="ex in cycleExercises(cycle.id)" 
+                :key="ex.order"
+                :titulo="ex.name"
+                :dificultad="ex.difficulty"
+                :grupo="ex.group"
+                :id="ex.id"
+                :getterEx="() => getRoutine(routine.id)"
+              />
             </div>
           </div>
           <div class="buttons">
-            <button @click="$emit('edit', routine.id)">Editar</button>
+            <button @click="$router.push(`editar-rutina/${routine.id}`)">Editar</button>
             <button class="delete-button" @click="deleteRoutine">Eliminar</button>
           </div>
       </div>
@@ -29,7 +37,7 @@
 <script>
 import Spinner from "../components/micro-components/Spinner.vue";
 import Modal from "../components/Modal.vue";
-import CreateCard from "../components/CreateCard.vue";
+import ExerciseCard from "../components/ExerciseCard.vue";
 import { Api } from "../../api/api";
 
 export default {
@@ -37,7 +45,7 @@ export default {
   components: {
     Spinner,
     Modal,
-    CreateCard
+    ExerciseCard
   },
   data() {
     return {
@@ -104,7 +112,6 @@ export default {
           return;
         }
       });
-      console.log(this.routine);
       this.loading = false;
     },
     async deleteRoutine() {
@@ -125,6 +132,8 @@ export default {
       let exercises = this.exercises.filter(e => e.cycleID === cycleID);
       exercises = exercises.map((e) => ({
         name: e.exercise.name,
+        group: e.exercise.metadata.grupo,
+        difficulty: e.exercise.metadata.dif,
         order: e.order,
         id: e.exercise.id,
       }));

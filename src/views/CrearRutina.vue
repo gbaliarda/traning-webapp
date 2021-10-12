@@ -58,11 +58,9 @@ export default {
   methods: {
     newCycle() {
       this.cycles.push(this.cycleID++);
-      console.log(this.cycles);
     },
     removeCycle(index) {
       this.cycles.splice(index,1);
-      console.log(this.cycles);
     },
     async createRutina() {
       let name = this.name;

@@ -2,13 +2,8 @@
   <div class="container">
     <h1 id="title">Mi perfil</h1>
     <div v-if="!loadingProfile" class="row">
-      <div id="picture-container">
-        <img
-          src="../assets/account_circle.svg"
-          width="300"
-          alt="Foto de perfil"
-        />
-        <v-icon id="picture-pencil" class="editIcon">mdi-pencil</v-icon>
+      <div id="picture-container" @click="editProfilePicture">
+        <img :src="result.avatarUrl != null ?require(`../assets/avatars/${result.avatarUrl}`):require(`../assets/avatars/default.svg`)" alt="Foto de perfil" class="avatarImg" />
       </div>
       <div id="info-container" class="d-flex">
         <div
@@ -35,6 +30,18 @@
     <div v-else>
       <Spinner />
     </div>
+    <Modal title="Editar foto de perfil" :open="modalOpen" :closeMod="closeMod">
+      <div v-if="!loadingStatus">
+        <div class="pic-container">
+          <ImgProfile @img-update="handleChange" :handleFinish="handleFinish" v-for="picture in pictures" :name="picture" :key="picture" />
+        </div>
+        <p v-if="errorStatus" class="error-msg">Error al cambiar imagen</p>
+        <p v-else-if="errorStatus == false" class="success-msg">Imagen cambiada con exito</p>
+      </div>
+      <div v-else>
+        <Spinner />
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -42,11 +49,15 @@
 import Spinner from "../components/micro-components/Spinner.vue"
 import { mapActions, mapState } from 'vuex';
 import { Api } from '../../api/api.js';
+import Modal from "../components/Modal.vue";
+import ImgProfile from "../components/ImgProfile.vue";
 
 export default {
   name: "Profile",
   components: {
     Spinner,
+    Modal,
+    ImgProfile,
   },
   data() {
     return {
@@ -54,6 +65,10 @@ export default {
       bEmail: '',
       bName: '',
       loadingProfile: false,
+      modalOpen: false,
+      pictures: ["default", "F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3"],
+      loadingStatus: false,
+      errorStatus: undefined,
     }
   },
   computed: {
@@ -115,7 +130,7 @@ export default {
     },
     async getCurrentUser() {
       this.loadingProfile = true;
-      await this.$getCurrentUser()
+      await this.$getCurrentUser();
       this.setResult(this.$user)
       this.loadingProfile = false;
     },
@@ -131,6 +146,33 @@ export default {
       }
     this.loadingProfile = false;
     },
+    closeMod() {
+      this.modalOpen = false;
+    },
+    editProfilePicture() {
+      this.errorStatus = undefined;
+      this.modalOpen = true;
+    },
+    handleChange() {
+      this.loadingStatus = true;
+    },
+    async handleFinish(error) {
+      if (error) {
+        this.loadingStatus = false;
+        this.errorStatus = true;
+        return;
+      }
+      const url = `${Api.baseUrl}/users/current`; 
+      try {
+        const result = await Api.get(url, true);
+        this.result = result;
+        this.errorStatus = false;
+      } catch (e) {
+        console.log(e.description);
+        this.errorStatus = true;
+      }
+      this.loadingStatus = false;
+    }
   },
   created() {
     this.getCurrentUser();
@@ -153,6 +195,24 @@ h3 {
   margin-bottom: -1px;
   margin-top: -1px;
   display: none;
+}
+
+.success-msg {
+  color: rgb(27, 167, 27);
+}
+
+.error-msg {
+  color: tomato;
+}
+
+.pic-container {
+  width: 400px;
+  height: 400px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-gap: 10px;
+  place-items: center;
 }
 
 .editIcon {
@@ -214,12 +274,20 @@ h3 {
 }
 
 #picture-container {
-  min-height: 306px;
+  height: 300px;
+  width: 300px;
+  display: grid;
+  place-items: center;
   position: relative;
   margin-right: 100px;
   border: 1px solid;
   border-radius: 10px;
   border-color: rgba($color: #000000, $alpha: 0.4);
+  cursor: pointer;
+
+  .avatarImg {
+    height: 270px;
+  }
 }
 
 #picture-pencil {

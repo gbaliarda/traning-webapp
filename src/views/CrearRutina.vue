@@ -9,40 +9,172 @@
     <div class="inputs">
       <div class="input">
         <p>Nombre</p>
-        <input type="text">
+        <input v-model="name" type="text">
       </div>
       <div class="input">
         <p>Dificultad</p>
         <!-- Reemplazar por select -->
-        <input type="text">
-      </div>
-      <div class="input">
-        <p>Duración</p>
-        <div class="duration-box">
-          <input type="number" min="0">
-          <!-- Reemplazar por select -->
-          <input type="text">
-        </div>
+        <select v-model="difficulty">
+          <option value="beginner">Principiante</option>
+          <option value="intermediate">Intermedio</option>
+          <option value="advanced">Avanzado</option>
+        </select>
       </div>
     </div>
-    <p>Ejercicios</p>
-    <div class="ejercicios">
-      <CreateCard titulo="Sentadillas" />
-      <CreateCard titulo="Estocadas" />
-    </div>
-    <Button text="Guardar" />
+    <RoutineCycle ref="cicloCalentamiento" title="Ciclo Calentamiento" />
+    <RoutineCycle v-for="(n, index) in cycles" ref="cicloEjercicio" :key="n" :title="`Ciclo Ejercicio ${index+1}`" @delete="removeCycle(index)" deleteable/>
+    <AddButton @click="newCycle" class="add-cycle-button"/>
+    <RoutineCycle ref="cicloEnfriamiento" title="Ciclo Enfriamiento" />
+    <Button @click="createRutina" text="Guardar" />
   </div>
 </template>
 
 <script>
 import Button from "../components/micro-components/Button.vue"
-import CreateCard from "../components/CreateCard.vue"
+import { Api } from "../../api/api"
+import AddButton from "../components/micro-components/AddButton.vue"
+import RoutineCycle from "../components/RoutineCycle.vue"
+import Modal from "../components/Modal.vue"
 
 export default {
   name: "CrearRutina",
   components: {
     Button,
-    CreateCard,
+    AddButton,
+    RoutineCycle,
+    Modal
+  },
+  data() {
+    return {
+      name: '',
+      detail: 'asdfasdfasdf',
+      difficulty: '',
+      cycleID: 0,
+      cycles: [],
+      modalOpen: true,
+      repeticiones: 0
+    }
+  },
+  methods: {
+    newCycle() {
+      this.cycles.push(this.cycleID++);
+    },
+    removeCycle(index) {
+      this.cycles.splice(index,1);
+    },
+    async createRutina() {
+      let name = this.name;
+      let detail = this.detail;
+      let isPublic = true;
+      let difficulty = this.difficulty;
+
+      let error = false;
+      if(name == "") {
+        console.log("Error: Nombre vacío");
+        error = true;
+      }
+
+      if(detail == "") {
+        console.log("Error: Descripción vacía");
+        error = true;
+      }
+
+      if(difficulty == "") {
+        console.log("Error: dificultad vacía");
+        error = true;
+      }
+
+      if(error) return;
+
+      //Post Rutina
+      let rutina = {
+        name,
+        detail,
+        isPublic,
+        difficulty
+      }
+      let routineID;
+      const url = `${Api.baseUrl}/routines`;
+      try {
+        const res = await Api.post(url, true, rutina);
+        routineID = res.id;
+      } catch(e) {
+        console.log(e);
+        return;
+      }
+
+      let cycles = [
+        {
+          id: null,
+          name: this.$refs.cicloCalentamiento.title,
+          type: "warmup",
+          repetitions: this.$refs.cicloCalentamiento.repetitions,
+          order: 1,
+          detail: "",
+          exercises: this.$refs.cicloCalentamiento.apiExercises
+        }
+      ]
+
+      if(this.$refs.cicloEjercicio) {
+        this.$refs.cicloEjercicio.forEach((ciclo, index) => {
+          cycles.push({
+            id: null,
+            name: ciclo.title,
+            type: "exercise",
+            repetitions: ciclo.repetitions,
+            order: index + 2,
+            detail: "",
+            exercises: ciclo.apiExercises
+          })
+        })
+      }
+
+      let exCount = this.$refs.cicloEjercicio ? this.$refs.cicloEjercicio.length : 0;
+
+      cycles.push({
+        id: null,
+        name: this.$refs.cicloEnfriamiento.title,
+        type: "cooldown",
+        repetitions: this.$refs.cicloEnfriamiento.repetitions,
+        order: exCount + 2,
+        detail: "",
+        exercises: this.$refs.cicloEnfriamiento.apiExercises
+      })
+
+      cycles.forEach(async (cycle, index) => {
+        const url = `${Api.baseUrl}/routines/${routineID}/cycles`;
+        let id;
+        try {
+          const res = await Api.post(url, true, {
+            name: cycle.name,
+            detail: cycle.detail,
+            repetitions: cycle.repetitions,
+            order: cycle.order,
+            type: cycle.type
+          });
+          id = res.id;
+        } catch(e) {
+          console.log(e);
+          return;
+        }
+
+        cycle.exercises.forEach(async (exercise, index) => {
+          const url = `${Api.baseUrl}/cycles/${id}/exercises/${exercise.id}`;
+          try {
+            const res = await Api.post(url, true, {
+              order: index+1,
+              repetitions: exercise.repetitions,
+              duration:0
+            });
+          } catch(e) {
+            console.log(e);
+            return;
+          }
+        })
+      });
+      
+      this.$router.go(-1);
+    }
   }
 };
 </script>
@@ -53,22 +185,14 @@ export default {
     margin: auto;
     margin-top: 4em;
 
-    .ejercicios {
-      display: flex;
-      flex-wrap: wrap;
+    .add-cycle-button {
+      margin-bottom: 48px;
+      width: 100%;
     }
 
     p {
       font-size: 1.4em;
       margin-bottom: 1em;
-    }
-
-    button {
-      position: fixed;
-      right: 50px;
-      bottom: 50px;
-      padding-left: 1.3em;
-      padding-right: 1.3em;
     }
 
     .title {
@@ -98,7 +222,7 @@ export default {
         width: 45%;
         margin-bottom: 2em;
         
-        input {
+        input,select {
           width: 100%;
           border: 1px solid #BFBFBF;
           border-radius: 10px;
@@ -106,16 +230,7 @@ export default {
           outline: none;
         }
       }
-
-      .duration-box {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-
-        input {
-          width: 45%;
-        }
-      }
     }
+    
   }
 </style>

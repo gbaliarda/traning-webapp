@@ -2,28 +2,76 @@
   <div class="container">
     <div class="title">
       <h1>Mis rutinas</h1>
-      <v-icon class="icon" size="30">mdi-pencil</v-icon>
     </div>
     <div class="rutinas">
-      <RoutineCard titulo="Piernas" duracion="30 minutos" dificultad="avanzada" />
-      <RoutineCard titulo="Brazos" duracion="30 minutos" dificultad="avanzada" />
+      <RoutineCard 
+        v-for="routine in routines"
+        :key="routine.id"
+        :titulo="routine.name"
+        :dificultad="routine.difficulty"
+        @details="openModal(routine.id)"
+      />
       <router-link to="/crear-rutina">
         <AddButton />
       </router-link>
     </div>
+    <ViewRoutineModal ref="modal"/>
   </div>
 </template>
 
 <script>
 import RoutineCard from "../components/RoutineCard.vue"
 import AddButton from "../components/micro-components/AddButton.vue"
+import ViewRoutineModal from "../components/ViewRoutineModal.vue";
+import { Api } from "../../api/api";
 
 export default {
   name: "Rutinas",
   components: {
     RoutineCard,
     AddButton,
-  }
+    ViewRoutineModal
+  },
+  data(){
+    return{
+      routines: []
+    }
+  },
+  methods: {
+    async getRoutines() {
+      let url = `${Api.baseUrl}/routines`;
+      try {
+        const res = await Api.get(url, true);
+        this.routines = res.content;
+      } catch (e) {
+        console.log(`Error al obtener rutinas: ${e}`);
+        return;
+      }
+
+      const diffMap = {
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      }
+
+      this.routines = this.routines.map((routine) => {
+        routine.difficulty = diffMap[routine.difficulty];
+        return routine;
+      })
+      
+    },
+    openModal(routineID) {
+      this.$refs.modal.open(routineID);
+    },
+    closeModal() {
+      this.$refs.modal.close();
+    }
+  },
+  mounted() {
+    this.$nextTick(async () => {
+      this.getRoutines();
+    })
+  } 
 };
 </script>
 

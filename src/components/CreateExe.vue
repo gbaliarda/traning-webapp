@@ -1,7 +1,7 @@
 <template>
   <form @submit="handleSubmit" class="createExe">
-    <v-icon v-if="this.id && !editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-pencil</v-icon>
-    <v-icon v-else-if="this.id && editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-close</v-icon>
+    <v-icon v-if="editable && this.id && !editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-pencil</v-icon>
+    <v-icon v-else-if="editable && this.id && editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-close</v-icon>
     <input v-model="nombre" required placeholder="Nombre" type="text" :disabled="!editing">
     <select required v-model="grupo" :disabled="!editing">
       <option disabled>Grupo Muscular</option>
@@ -20,7 +20,7 @@
     <div class="arrow-dif"></div>
     <textarea placeholder="Descripción" cols="30" rows="10" v-model="desc" :disabled="!editing"></textarea>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
-    <div class="buttons">
+    <div v-if="editable" class="buttons">
       <Button v-if="!loading" text="Guardar" class="btn" :class="{ disabled: !editing }" />
       <div v-else class="loadingBtn">
         <Spinner />
@@ -51,6 +51,10 @@ export default {
     getterEx: Function,
     id: Number,
     closeMod: Function,
+    editable: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {

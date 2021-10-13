@@ -11,7 +11,12 @@ export default {
     },
     getters: {
         isLoggedIn(state) {
-            return state.token != null
+            if(state.token == null) {
+                state.token = localStorage.getItem(SECURITY_TOKEN_KEY);
+                if(state.token == null) return false;
+                return true;
+            }
+            else return true
         }
     },
     mutations: {

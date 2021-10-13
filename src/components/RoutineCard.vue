@@ -6,7 +6,7 @@
       <p>Dificultad: {{ dificultad }}</p>
     </div>
     <div class="buttons">
-      <button>Detalles</button>
+      <button @click="$emit('details')">Detalles</button>
       <v-icon class="icon" size="34">mdi-share-variant</v-icon>
     </div>
   </div>

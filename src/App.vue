@@ -57,16 +57,21 @@ export default {
     scroll-behavior: smooth;
   }
 
-  html::-webkit-scrollbar {
+  *::-webkit-scrollbar {
       width: 10px;
   }
-  
+
   html::-webkit-scrollbar-track {
       border-radius: 150px;
       background: white;
   }
+
+  *:not(html, body)::-webkit-scrollbar-track {
+      border-radius: 150px;
+      background: #00000020;
+  }
   
-  html::-webkit-scrollbar-thumb {
+  *::-webkit-scrollbar-thumb {
       background:#DA611B;
       border-radius: 150px;
   }

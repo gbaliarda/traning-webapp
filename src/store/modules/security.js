@@ -55,9 +55,6 @@ export default {
             dispatch('removeToken')
         },
         async getCurrentUser({state, commit}) {
-            if (state.user)
-                return state.user
-
             const result = await UserApi.get()
             commit('setUser', result)
         }

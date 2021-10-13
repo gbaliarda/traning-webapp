@@ -1,7 +1,7 @@
 <template>
     <div class="relative-container">
         <Modal :open="modalOpen" title="Elegir Ejercicio" :closeMod="()=>{this.modalOpen = false}">
-            <ChooseExerciseModal @choose="chooseEx"/>
+            <ChooseExerciseModal :notSelectedExercises="notSelectedEx" @choose="chooseEx"/>
         </Modal>
         <div class="column">
         <div class="title-row row">
@@ -10,13 +10,13 @@
         </div>
         <div class="row">
             <CreateCard 
-              v-for="(ex,index) in exercises"
+              v-for="(ex,index) in selectedEx"
               ref="exercise"
               :key="ex.id"
               :id="ex.id"
               :titulo="ex.name"
               :startRepetitions="ex.repetitions"
-              @delete="exercises.splice(index,1)"
+              @delete="() => deleteEx(ex, index)"
             />
             <AddButton @click="modalOpen = true" class="add-button"/>
         </div>
@@ -31,13 +31,15 @@ import AddButton from "../components/micro-components/AddButton.vue"
 import NumInput from "../components/micro-components/NumInput.vue"
 import Modal from "../components/Modal.vue"
 import ChooseExerciseModal from "../components/ChooseExerciseModal.vue"
+import { Api } from "../../api/api"
 
 export default {
     name: "RoutineCycle",
     data() {
         return {
             repetitions: 1,
-            exercises: [],
+            notSelectedEx: [],
+            selectedEx: [],
             modalOpen: false
         }
     },
@@ -58,21 +60,42 @@ export default {
             default: false
         }
     },
-    computed: {
-      apiExercises() {
-        return this.exercises.map((ex, index) => ({
-          id: ex.id,
-          duration: 0,
-          repetitions: this.$refs.exercise[index].repetitions
-        }))
-      }
-    },
     methods: {
       chooseEx(exercise) {
         this.modalOpen = false;
-        this.exercises.push(exercise);
-      }
-    }
+        this.selectedEx.push(exercise);
+        this.notSelectedEx = this.notSelectedEx.filter(ex => ex.id != exercise.id);
+      },
+      deleteEx(ex, index) {
+        this.selectedEx.splice(index,1);
+        this.notSelectedEx.push(ex);
+      },
+      async getExAmount() {
+        const url = `${Api.baseUrl}/exercises?size=1`;
+        try {
+          const res = await Api.get(url, true);
+          return res.totalCount;
+        } catch(e) {
+          console.log(e);
+          return 0;
+        }
+      },
+      async getExercises() {
+        const totalExercises = await this.getExAmount();
+        let url = `${Api.baseUrl}/exercises?size=${totalExercises}`;
+        if(!totalExercises) 
+          url = `${Api.baseUrl}/exercises`;
+        try {
+          const res = await Api.get(url, true);
+          this.notSelectedEx = res.content;
+        } catch(e) {
+          console.log(e);
+        }
+      },
+    },
+    created() {
+      this.getExercises();
+    },
 }
 </script>
 

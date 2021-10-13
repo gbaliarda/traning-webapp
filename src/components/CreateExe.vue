@@ -3,7 +3,7 @@
     <v-icon v-if="editable && this.id && !editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-pencil</v-icon>
     <v-icon v-else-if="editable && this.id && editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-close</v-icon>
     <input v-model="nombre" required placeholder="Nombre" type="text" :disabled="!editing">
-    <select required v-model="grupo" :disabled="!editing">
+    <select required v-model="grupo" :disabled="!editing" class="groupSelect">
       <option disabled>Grupo Muscular</option>
       <option>Piernas</option>
       <option>Brazos</option>
@@ -11,14 +11,14 @@
       <option>Hombros</option>
     </select>
     <div class="arrow-grp"></div>
-    <select required v-model="dif" :disabled="!editing">
+    <select required v-model="dif" :disabled="!editing" class="difSelect">
       <option disabled>Dificultad</option>
       <option>Principiante</option>
       <option>Intermedia</option>
       <option>Avanzada</option>
     </select>
     <div class="arrow-dif"></div>
-    <textarea placeholder="Descripción" cols="30" rows="10" v-model="desc" :disabled="!editing"></textarea>
+    <textarea placeholder="Descripción" cols="30" rows="10" v-model="desc" :disabled="!editing" class="inputTextarea"></textarea>
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
     <div v-if="editable" class="buttons">
       <Button v-if="!loading" text="Guardar" class="btn" :class="{ disabled: !editing }" />
@@ -168,6 +168,18 @@ export default {
   place-items: start;
   width: 500px;
 
+  .inputTextarea {
+    min-height: 200px;
+  }
+
+  .groupSelect, .difSelect {
+    cursor: pointer;
+  }
+
+  .groupSelect:disabled, .difSelect:disabled {
+    cursor: default;
+  }
+
   .hidden {
     display: none;
   }
@@ -250,6 +262,10 @@ input, textarea, select {
   border-radius: 10px;
   width: 100%;
   padding: .5em 1em;
+}
+
+textarea {
+  resize: none;
 }
 
 .arrow-grp, .arrow-dif {

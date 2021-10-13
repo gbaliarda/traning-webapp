@@ -11,20 +11,29 @@
         <p>Nombre</p>
         <input v-model="name" type="text">
       </div>
-      <div class="input">
+      <div class="input inputDificultad">
         <p>Dificultad</p>
         <!-- Reemplazar por select -->
-        <select v-model="difficulty">
+        <select v-model="difficulty" class="dificultadDropdown">
           <option value="beginner">Principiante</option>
           <option value="intermediate">Intermedio</option>
           <option value="advanced">Avanzado</option>
         </select>
+        <div class="arrow-dif"></div>
+      </div>
+    </div>
+    <div class="inputs bottomInputs">
+      <div class="input">
+        <p>Descripcion</p>
+        <textarea v-model="detail" class="detailsTextarea"></textarea>
       </div>
     </div>
     <RoutineCycle ref="cicloCalentamiento" title="Ciclo Calentamiento" />
-    <RoutineCycle v-for="(n, index) in cycles" ref="cicloEjercicio" :key="n" :title="`Ciclo Ejercicio ${index+1}`" @delete="removeCycle(index)" deleteable/>
+    <RoutineCycle ref="cicloCalentamiento" title="Ciclo 1" />
+    <RoutineCycle v-for="(n, index) in cycles" ref="cicloEjercicio" :key="n" :title="`Ciclo ${index+1}`" @delete="removeCycle(index)" deleteable/>
     <AddButton @click="newCycle" class="add-cycle-button"/>
     <RoutineCycle ref="cicloEnfriamiento" title="Ciclo Enfriamiento" />
+    <p v-if="error" :class="error ? 'error-msg' : 'hidden'">{{textError}}</p>
     <Button @click="createRutina" text="Guardar" />
   </div>
 </template>
@@ -47,12 +56,14 @@ export default {
   data() {
     return {
       name: '',
-      detail: 'asdfasdfasdf',
+      detail: '',
       difficulty: '',
       cycleID: 0,
       cycles: [],
       modalOpen: true,
-      repeticiones: 0
+      repeticiones: 0,
+      error: false,
+      textError: '',
     }
   },
   methods: {
@@ -68,23 +79,23 @@ export default {
       let isPublic = true;
       let difficulty = this.difficulty;
 
-      let error = false;
       if(name == "") {
-        console.log("Error: Nombre vacío");
-        error = true;
+        this.textError = "Inserte un nombre";
+        this.error = true;
+        return;
       }
 
       if(detail == "") {
-        console.log("Error: Descripción vacía");
-        error = true;
+        this.textError = "Inserte una descripción";
+        this.error = true;
+        return;
       }
 
       if(difficulty == "") {
-        console.log("Error: dificultad vacía");
-        error = true;
+        this.textError = "Seleccione la dificultad";
+        this.error = true;
+        return;
       }
-
-      if(error) return;
 
       //Post Rutina
       let rutina = {
@@ -98,8 +109,10 @@ export default {
       try {
         const res = await Api.post(url, true, rutina);
         routineID = res.id;
+        this.error = false;
       } catch(e) {
-        console.log(e);
+        this.error = true;
+        this.textError = e.description;
         return;
       }
 
@@ -184,6 +197,32 @@ export default {
     width: 80%;
     margin: auto;
     margin-top: 4em;
+    margin-bottom: 4em;
+
+    .error-msg {
+      color: tomato;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .arrow-dif {
+      width: 0; 
+      height: 0; 
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      position: absolute;
+      right: 65px;
+      pointer-events: none;
+      border-top: 10px solid #EA8D59;
+      top: 67px;
+      right: 5%;
+    }
+
+    .dificultadDropdown {
+      cursor: pointer;
+    }
 
     .add-cycle-button {
       margin-bottom: 48px;
@@ -230,7 +269,25 @@ export default {
           outline: none;
         }
       }
+
+      .detailsTextarea {
+        resize: none;
+        width: 100%;
+        height: 130px;
+        border: 1px solid #BFBFBF;
+        border-radius: 10px;
+        padding: .7em 1em;
+        outline: none;
+        cursor: text;
+      }
+
+      .inputDificultad {
+        position: relative;
+      }
     }
     
+    .bottomInputs {
+      margin-top: 0;
+    }
   }
 </style>

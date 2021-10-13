@@ -1,67 +1,52 @@
 <template>
   <div class="container">
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
-    <div :class="loading ? 'hidden' : 'ejercicios'">
-        <div v-for="ex in exercises" :key="ex.id" class="ejercicio">
+    <div v-if="notSelectedExercises.length > 0" class='ejercicios'>
+        <div v-for="ex in notSelectedExercises" :key="ex.id" class="ejercicio">
             <p class="card-title">{{ ex.name }}</p>
             <div class="descripcion">
                 <p>Grupo: {{ ex.metadata.grupo }}</p>
                 <p>Dificultad: {{ ex.metadata.dif }}</p>
             </div>
-            <button @click="$emit('choose', ex)">Elegir</button>
+            <button @click="() => $emit('choose', ex)">Elegir</button>
         </div>
     </div>
-    <Spinner :class="{'hidden': !loading}" />
+    <div v-else style="text-align: center">
+      <p>No hay ejercicios creados.</p>
+      <br /><br />
+      <router-link to="/ejercicios">
+        <Button text="Crear ejercicios"></Button>
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script>
 import Spinner from "../components/micro-components/Spinner.vue"
-import { Api } from "../../api/api"
+import Button from './micro-components/Button.vue';
 
 export default {
   name: "ChooseExerciseModal",
+  props: {
+    notSelectedExercises: Array,
+  },
   components: {
     Spinner,
+    Button,
   },
   data() {
     return {
-      exercises: [],
       error: {
         description: "",
       },
-      loading: true,
     }
   },
-  methods: {
-    async getExercises() {
-      const url = `${Api.baseUrl}/exercises`;
-      try {
-        const res = await Api.get(url, true);
-        this.exercises = res.content;
-      } catch(e) {
-        if (e.code == 99)
-          this.error.description = "Error al cargar ejercicios";
-        else
-          this.error = e;
-      }
-      this.loading = false;
-    }
-  },
-  choose(id) {
-
-  },
-  created() {
-    this.getExercises();
-  }
 };
 </script>
 
 <style scoped lang="scss">
   .container {
-    width: 80%;
-    margin: auto;
-    margin-top: 4em;
+    width: 600px;
 
     .hidden {
       display: none;
@@ -78,23 +63,27 @@ export default {
     }
     
     .ejercicios {
-      display: flex; // quizas cambiar a grid
-      flex-wrap: wrap;
-      margin-top: 5em;
+      padding: 10px 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 30px;
+      place-items: center;
+      margin-top: 4em;
+      width: 100%;
+      max-height: 470px;
+      overflow-y: scroll;
     }
   }
   .ejercicio {
-    padding: 2em 1em;
+    padding: 1em 1em;
     width: 250px;
-    height: 250px;
+    height: 220px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     flex-shrink: 0;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    margin-right: 3em;
-    margin-bottom: 2em;
 
     .card-title {
       font-size: 1.4em;

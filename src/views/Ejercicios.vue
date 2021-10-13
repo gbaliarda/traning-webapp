@@ -61,7 +61,10 @@ export default {
     },
     async getExercises() {
       const totalExercises = await this.getExAmount();
-      const url = `${Api.baseUrl}/exercises?size=${totalExercises}`;
+      let url = `${Api.baseUrl}/exercises?size=${totalExercises}`;
+      if(!totalExercises) 
+        url = `${Api.baseUrl}/exercises`;
+      
       try {
         const res = await Api.get(url, true);
         this.exercises = res.content;

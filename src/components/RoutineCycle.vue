@@ -60,6 +60,15 @@ export default {
             default: false
         }
     },
+    computed: {
+      apiExercises() {
+        return this.selectedEx.map((ex, index) => ({
+          id: ex.id,
+          duration: 0,
+          repetitions: this.$refs.exercise[index].repetitions
+        }))
+      }
+    },
     methods: {
       chooseEx(exercise) {
         this.modalOpen = false;
@@ -88,6 +97,13 @@ export default {
         try {
           const res = await Api.get(url, true);
           this.notSelectedEx = res.content;
+          this.notSelectedEx = this.notSelectedEx.filter((ex) => {
+            let aux = true;
+            this.selectedEx.forEach(element => {
+              if(element.id == ex.id) aux = false;
+            });
+            return aux;
+          });
         } catch(e) {
           console.log(e);
         }

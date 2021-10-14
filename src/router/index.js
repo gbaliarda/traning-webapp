@@ -5,6 +5,7 @@ import Ejercicios from "../views/Ejercicios.vue";
 import Rutinas from "../views/Rutinas.vue";
 import CrearRutina from "../views/CrearRutina.vue";
 import EditarRutina from "../views/EditarRutina.vue";
+import VerRutina from "../views/VerRutina.vue"
 import Perfil from "../views/Perfil.vue";
 import P404 from "../views/P404.vue";
 import store from "../store";
@@ -45,10 +46,19 @@ const routes = [
     path: "/editar-rutina/:id",
     name: "EditarRutina",
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
     },
     props: true,
-    component: EditarRutina
+    component: EditarRutina,
+  },
+  {
+    path: "/ver-rutina/:id",
+    name: "VerRutina",
+    meta: {
+      requiresAuth: true,
+    },
+    props: true,
+    component: VerRutina,
   },
   {
     path: "/perfil",
@@ -63,7 +73,7 @@ const routes = [
     alias: "*",
     name: "P404",
     component: P404,
-  }
+  },
 ];
 
 const router = new VueRouter({
@@ -73,12 +83,9 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth)
-    if (!store.getters['security/isLoggedIn'])
-      next({ name: "Home" })
-    else
-      next()
-  else
-    next()
-})
+    if (!store.getters["security/isLoggedIn"]) next({ name: "Home" });
+    else next();
+  else next();
+});
 
 export default router;

@@ -5,29 +5,31 @@
         {{ error.description }}
       </p>
       <div v-if="!loading && routine" class="rutina">
-          <h1>{{ routine.name }}</h1>
-          <div class="descripcion">
-            <p>Detalles: {{ routine.detail }}</p>
-            <p>Dificultad: {{ routine.difficulty }}</p>
+        <h1>{{ routine.name }}</h1>
+        <div class="descripcion">
+          <p>Detalles: {{ routine.detail }}</p>
+          <p>Dificultad: {{ routine.difficulty }}</p>
+        </div>
+        <div class="cycle" v-for="cycle in cycles" :key="cycle.id">
+          <p>{{ cycle.name }}</p>
+          <div class="exercises">
+            <ExerciseCard
+              v-for="ex in cycleExercises(cycle.id)"
+              :key="ex.order"
+              :titulo="ex.name"
+              :dificultad="ex.difficulty"
+              :grupo="ex.group"
+              :id="ex.id"
+              :getterEx="() => getRoutine(routine.id)"
+            />
           </div>
-          <div class="cycle" v-for="cycle in cycles" :key="cycle.id">
-            <p>{{cycle.name}}</p>
-            <div class="exercises">
-              <ExerciseCard 
-                v-for="ex in cycleExercises(cycle.id)" 
-                :key="ex.order"
-                :titulo="ex.name"
-                :dificultad="ex.difficulty"
-                :grupo="ex.group"
-                :id="ex.id"
-                :getterEx="() => getRoutine(routine.id)"
-              />
-            </div>
-          </div>
-          <div class="buttons">
-            <button @click="$router.push(`editar-rutina/${routine.id}`)">Editar</button>
-            <button class="delete-button" @click="deleteRoutine">Eliminar</button>
-          </div>
+        </div>
+        <div v-if="editable" class="buttons">
+          <button @click="$router.push(`editar-rutina/${routine.id}`)">
+            Editar
+          </button>
+          <button class="delete-button" @click="deleteRoutine">Eliminar</button>
+        </div>
       </div>
       <Spinner :class="{ hidden: !loading }" />
     </div>
@@ -45,7 +47,7 @@ export default {
   components: {
     Spinner,
     Modal,
-    ExerciseCard
+    ExerciseCard,
   },
   data() {
     return {
@@ -56,8 +58,14 @@ export default {
         description: "",
       },
       loading: true,
-      modalOpen: false
+      modalOpen: false,
     };
+  },
+  props: {
+    editable: {
+        type: Boolean,
+        default: true 
+      }
   },
   methods: {
     async getRoutine(routineID) {
@@ -78,10 +86,10 @@ export default {
       }
 
       const diffMap = {
-        "beginner": "Principiante",
-        "intermediate": "Intermedio",
-        "advanced": "Avanzado"
-      }
+        beginner: "Principiante",
+        intermediate: "Intermedio",
+        advanced: "Avanzado",
+      };
 
       this.routine.difficulty = diffMap[this.routine.difficulty];
 
@@ -89,7 +97,7 @@ export default {
       url = `${Api.baseUrl}/routines/${routineID}/cycles`;
       try {
         const res = await Api.get(url, true);
-        this.cycles = res.content.sort((a,b)=>a.order - b.order);
+        this.cycles = res.content.sort((a, b) => a.order - b.order);
       } catch (e) {
         if (e.code == 99) this.error.description = "Error al cargar ciclos";
         else this.error = e;
@@ -105,9 +113,10 @@ export default {
             ex.cycleID = cycle.id;
             this.exercises.push(ex);
           });
-          this.exercises = this.exercises.sort((a,b)=>a.order - b.order);
+          this.exercises = this.exercises.sort((a, b) => a.order - b.order);
         } catch (e) {
-          if (e.code == 99) this.error.description = "Error al cargar ejercicios";
+          if (e.code == 99)
+            this.error.description = "Error al cargar ejercicios";
           else this.error = e;
           return;
         }
@@ -129,7 +138,7 @@ export default {
       this.$router.go();
     },
     cycleExercises(cycleID) {
-      let exercises = this.exercises.filter(e => e.cycleID === cycleID);
+      let exercises = this.exercises.filter((e) => e.cycleID === cycleID);
       exercises = exercises.map((e) => ({
         name: e.exercise.name,
         group: e.exercise.metadata.grupo,
@@ -146,7 +155,8 @@ export default {
     },
     close() {
       this.modalOpen = false;
-    }
+      this.$emit('close');
+    },
   },
 };
 </script>
@@ -164,7 +174,7 @@ export default {
   .cycle {
     display: flex;
     flex-direction: column;
-    outline: #BFBFBF solid 1px;
+    outline: #bfbfbf solid 1px;
     border-radius: 10px;
     padding-top: 18px;
     padding-left: 32px;
@@ -259,5 +269,14 @@ export default {
     margin: 0;
   }
 }
+</style>
+y-content: space-between;
+  flex-grow: 1;
+  padding: 0;
+  margin-bottom: 10px;
 
+  button {
+    margin: 0;
+  }
+}
 </style>

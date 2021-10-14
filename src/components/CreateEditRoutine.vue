@@ -112,6 +112,7 @@ export default {
     },
     async saveRoutine() {
       let error = false;
+      this.loadingSave = true;
 
       if (this.name == "") {
         this.textError = "Inserte un nombre";
@@ -142,10 +143,10 @@ export default {
           const deleteUrl = `${Api.baseUrl}/routines/${this.id}`;
           await Api.delete(deleteUrl, true);
         }
-
         const postUrl = `${Api.baseUrl}/routines`;
         const res = await Api.post(postUrl, true, rutina);
         routineID = res.id;
+
         this.error = false;
       } catch (e) {
         this.error = true;
@@ -235,6 +236,7 @@ export default {
         });
       });
 
+      this.loadingSave = false;
       this.$router.go(-1);
     },
   },
@@ -289,7 +291,7 @@ export default {
     this.duration = routine.metadata.duration;
 
     //Ciclos
-    url = `${Api.baseUrl}/routines/${this.id}/cycles`;
+    url = `${Api.baseUrl}/routines/${this.id}/cycles?size=999`;
     try {
       const res = await Api.get(url, true);
       this.cycles = res.content.sort((a, b) => a.order - b.order);
@@ -301,7 +303,7 @@ export default {
 
     //Ejercicios
     this.cycles.forEach(async (cycle, index) => {
-      url = `${Api.baseUrl}/cycles/${cycle.id}/exercises`;
+      url = `${Api.baseUrl}/cycles/${cycle.id}/exercises?size=999`;
       try {
         const res = await Api.get(url, true);
         let exercises = res.content

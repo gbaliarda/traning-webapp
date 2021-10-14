@@ -11,14 +11,17 @@
           <p>Dificultad: {{ routine.difficulty }}</p>
         </div>
         <div class="cycle" v-for="cycle in cycles" :key="cycle.id">
-          <p>{{ cycle.name }}</p>
+          <div class="cycle-row">
+            <p>{{ cycle.name }}</p>
+            <p class="repetitions">Repeticiones: {{ cycle.repetitions }}</p>
+          </div>
           <div class="exercises">
             <ExerciseCard
               v-for="ex in cycleExercises(cycle.id)"
               :key="ex.order"
               :titulo="ex.name"
-              :dificultad="ex.difficulty"
               :grupo="ex.group"
+              :duration="getDuration(ex)"
               :id="ex.id"
               :getterEx="() => getRoutine(routine.id)"
             />
@@ -144,6 +147,8 @@ export default {
         group: e.exercise.metadata.grupo,
         difficulty: e.exercise.metadata.dif,
         order: e.order,
+        duration: e.duration,
+        repetitions: e.repetitions,
         id: e.exercise.id,
       }));
       return exercises;
@@ -157,6 +162,16 @@ export default {
       this.modalOpen = false;
       this.$emit('close');
     },
+    getDuration(ex) {
+      if(ex.repetitions) {
+        return `Repeticiones: ${ex.repetitions}`;
+      }
+      if(ex.duration && ex.duration < 60) {
+        return `Duración: ${ex.duration} segundos`;
+      }
+      
+      return `Duración: ${Math.floor(ex.duration/60)} minutos`;
+    }
   },
 };
 </script>
@@ -181,9 +196,21 @@ export default {
     margin-bottom: 48px;
     width: 100%;
 
+    .cycle-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding-right: 24px;
+    }
+
     p {
       font-size: 1.4em;
       margin-bottom: 1em;
+    }
+
+    .repetitions {
+      font-size: 1em;
+      color: #000000B0;
     }
 
     .exercises {

@@ -2,8 +2,9 @@
   <div class="ejercicio">
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
-      <p>Grupo: {{ grupo }}</p>
-      <p>Dificultad: {{ dificultad }}</p>
+      <p v-if="grupo">Grupo: {{ grupo }}</p>
+      <p v-if="dificultad">Dificultad: {{ dificultad }}</p>
+      <p v-if="duration">{{ duration }}</p>
     </div>
     <button @click="openModal">Detalles</button>
     <Modal title="Detalles" :open="modalOpen" :closeMod="closeMod">
@@ -33,6 +34,7 @@ export default {
     dificultad: String,
     id: Number,
     getterEx: Function,
+    duration: String,
   },
   methods: {
     openModal() {

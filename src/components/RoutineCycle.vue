@@ -16,6 +16,7 @@
               :id="ex.id"
               :titulo="ex.name"
               :startRepetitions="ex.repetitions"
+              :startDuration="ex.duration"
               @delete="() => deleteEx(ex, index)"
             />
             <AddButton @click="modalOpen = true" class="add-button"/>
@@ -64,7 +65,7 @@ export default {
       apiExercises() {
         return this.selectedEx.map((ex, index) => ({
           id: ex.id,
-          duration: 0,
+          duration: this.$refs.exercise[index].duration,
           repetitions: this.$refs.exercise[index].repetitions
         }))
       }
@@ -159,10 +160,10 @@ export default {
     }
 
     .input {
-      padding-top: 4px;
+      margin-top: 4px;
       margin-left: 24px;
       margin-right: 24px;
-      width: 150px;
+      width: 180px;
     }
 
     .icon {

@@ -3,6 +3,7 @@
     <div class="title">
       <h1>Mis rutinas</h1>
     </div>
+    <p v-if="error.status" class="error-msg">{{ error.description }}</p>
     <div v-if="!loading" class="rutinas">
       <RoutineCard
         v-for="routine in routines"
@@ -48,6 +49,10 @@ export default {
       routines: [],
       loading: false,
       copyMessage: false,
+      error: {
+        status: false,
+        description: ""
+      }
     };
   },
   computed: {
@@ -63,13 +68,18 @@ export default {
       $getCurrentUser: 'getCurrentUser',
     }),
     async getRoutines() {
-      await this.$getCurrentUser();
-      let url = `${Api.baseUrl}/routines?size=1000&userId=${this.$user.id}`;
       try {
+        await this.$getCurrentUser();
+        let url = `${Api.baseUrl}/routines?size=1000&userId=${this.$user.id}`;
         const res = await Api.get(url, true);
         this.routines = res.content;
+        this.error.status = false;
       } catch (e) {
-        console.log(`Error al obtener rutinas: ${e}`);
+        if (e.code == 99)
+          this.error.description = "Error al cargar rutinas";
+        else
+          this.error.description = e.description;
+        this.error.status = true;
         return;
       }
 
@@ -118,6 +128,7 @@ export default {
     this.$nextTick(async () => {
       this.getRoutines();
     });
+    this.loading = false;
   },
 };
 </script>
@@ -128,18 +139,14 @@ export default {
   margin: auto;
   margin-top: 4em;
 
-  .title {
-    display: flex;
+  h1 {
+    font-weight: 400;
+    margin-bottom: 1em;
+  }
 
-    h1 {
-      font-weight: 400;
-      margin-right: 0.8em;
-    }
-
-    .icon {
-      color: #da611b;
-      cursor: pointer;
-    }
+  .error-msg {
+    color: tomato;
+    font-size: 1.2em;
   }
 
   .rutinas {

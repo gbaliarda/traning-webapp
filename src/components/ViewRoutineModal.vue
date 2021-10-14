@@ -40,7 +40,7 @@
         </div>
       </div>
       
-      <Spinner :class="{ hidden: !loading }" />
+      <Spinner :class="{ hidden: !loading || error.description!='' }" />
     </div>
   </Modal>
 </template>

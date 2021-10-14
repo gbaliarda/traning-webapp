@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1 id="title">Mi perfil</h1>
-    <div v-if="!loadingProfile" class="row">
+    <div v-if="result && !loadingProfile" class="row">
       <div id="picture-container" @click="editProfilePicture">
         <img :src="result.avatarUrl != null ?require(`../assets/avatars/${result.avatarUrl}`):require(`../assets/avatars/default.svg`)" alt="Foto de perfil" class="avatarImg" />
       </div>
@@ -27,6 +27,7 @@
         </h3>
       </div>
     </div>
+    <p v-if="!result" style="color: tomato; font-size: 1.2em">No se pudo cargar la información de perfil</p>
     <div v-else>
       <Spinner />
     </div>
@@ -130,8 +131,12 @@ export default {
     },
     async getCurrentUser() {
       this.loadingProfile = true;
-      await this.$getCurrentUser();
-      this.setResult(this.$user)
+      try {
+        await this.$getCurrentUser();
+      } catch(e) {
+        console.log(e);
+      }
+      this.setResult(this.$user);
       this.loadingProfile = false;
     },
     async changeProfileInfo(data) {

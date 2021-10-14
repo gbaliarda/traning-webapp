@@ -2,7 +2,7 @@
   <form @submit="handleSubmit" class="createExe">
     <v-icon v-if="editable && this.id && !editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-pencil</v-icon>
     <v-icon v-else-if="editable && this.id && editing" size="27px" class="icon-edit" @click="toggleEditing">mdi-close</v-icon>
-    <input v-model="nombre" required placeholder="Nombre" type="text" :disabled="!editing">
+    <input v-model="nombre" required placeholder="Nombre*" type="text" :disabled="!editing">
     <select required v-model="grupo" :disabled="!editing" class="groupSelect">
       <option disabled>Grupo Muscular</option>
       <option>Piernas</option>

@@ -10,11 +10,11 @@
     <div v-if="!loading">
       <div class="inputs">
         <div class="input">
-          <p>Nombre</p>
+          <p>Nombre*</p>
           <input v-model="name" type="text" />
         </div>
         <div class="input inputDificultad">
-          <p>Dificultad</p>
+          <p>Dificultad*</p>
           <select v-model="difficulty" class="dificultadDropdown">
             <option value="beginner">Principiante</option>
             <option value="intermediate">Intermedio</option>
@@ -25,11 +25,11 @@
       </div>
       <div class="inputs bottomInputs">
         <div class="input">
-          <p>Descripcion</p>
+          <p>Descripción</p>
           <textarea v-model="detail" class="detailsTextarea"></textarea>
         </div>
         <div class="input">
-          <p>Duración (minutos)</p>
+          <p>Duración* <span style="font-size: .7em">(minutos)</span></p>
           <NumInput class="duration-input" v-model="duration" :min="0"/>
         </div>
       </div>
@@ -52,6 +52,9 @@
           <Spinner />
         </div>
       </div>
+    </div>
+    <div v-else>
+      <Spinner />
     </div>
   </div>
 </template>
@@ -117,12 +120,21 @@ export default {
       if (this.name == "") {
         this.textError = "Inserte un nombre";
         this.error = true;
+        this.loadingSave = false;
+        return;
+      }
+
+      if (this.duration == "") {
+        this.textError = "Inserte la duración";
+        this.error = true;
+        this.loadingSave = false;
         return;
       }
 
       if (this.difficulty == "") {
         this.textError = "Seleccione la dificultad";
         this.error = true;
+        this.loadingSave = false;
         return;
       }
 
@@ -150,7 +162,11 @@ export default {
         this.error = false;
       } catch (e) {
         this.error = true;
-        this.textError = e.description;
+        if (e.code == 99)
+          this.textError = "Error al guardar la rutina";
+        else
+          this.textError = e.description;
+        this.loadingSave = false;
         return;
       }
 
@@ -231,6 +247,7 @@ export default {
           } catch (e) {
             this.error = true;
             this.textError = e.description;
+            this.loadingSave = false;
             return;
           }
         });
@@ -280,10 +297,16 @@ export default {
       const res = await Api.get(url, true);
       routine = res;
     } catch (e) {
-      if (e.code == 99) this.error.description = "Error al cargar rutina";
-      else this.error = e;
+      this.error = true;
+      if (e.code == 99)
+        this.textError = "Error al cargar rutina";
+      else 
+        this.textError = e.description;
+      this.loading = false;
       return;
     }
+
+    this.loading = false;
 
     this.difficulty = routine.difficulty;
     this.name = routine.name;
@@ -296,9 +319,11 @@ export default {
       const res = await Api.get(url, true);
       this.cycles = res.content.sort((a, b) => a.order - b.order);
     } catch (e) {
-      if (e.code == 99) this.error.description = "Error al cargar ciclos";
-      else this.error = e;
-      return;
+      this.error = true;
+      if (e.code == 99)
+        this.textError = "Error al cargar ciclos";
+      else
+        this.textError = e.description;
     }
 
     //Ejercicios
@@ -347,6 +372,7 @@ export default {
   padding-bottom: 4em;
 
   .error-msg {
+    font-size: 1.2em;
     color: tomato;
   }
 

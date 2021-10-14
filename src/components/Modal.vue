@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:class="{root: open, hidden: !open}">
+  <div v-bind:class="{root: open, hidden: !open, hiding: hiding}">
     <div class="box">
       <v-icon class="closeBtn" size="30" @click="closeModal">mdi-close</v-icon>
       <h3>{{ title }}</h3>
@@ -17,9 +17,21 @@ export default {
     open: Boolean,
     closeMod: Function
   },
+  data() {
+    return {
+      hiding: true,
+    }
+  },
   methods: {
     closeModal() {
-      this.closeMod();
+      this.hiding = true;
+      setTimeout(() => this.closeMod(), 250);
+    }
+  },
+  watch: {
+    open: function(newVal, oldVal) {
+      if(newVal)
+        setTimeout(() => this.hiding = false, 5);
     }
   }
 };
@@ -35,6 +47,16 @@ export default {
   height: 100vh;
   place-items: center;
   z-index: 2;
+  transition: opacity .25s;
+}
+
+.hiding {
+  opacity: 0;
+
+  .box {
+    transition: transform .25s;
+    transform: translateY(25px);
+  }
 }
 
 .hidden {
@@ -59,6 +81,7 @@ export default {
   z-index: 1;
   position: relative;
   border-radius: 5px;
+  transition: transform .25s;
 
   h3 {
     text-align: center;

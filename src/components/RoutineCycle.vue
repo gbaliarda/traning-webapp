@@ -68,7 +68,7 @@ export default {
         return this.selectedEx.map((ex, index) => ({
           id: ex.id,
           duration: this.$refs.exercise[index].duration,
-          repetitions: this.$refs.exercise[index].repetitions
+          repetitions: this.$refs.exercise[index].repetitions,
           descanso: this.$refs.exercise[index].descanso,
         }))
       }

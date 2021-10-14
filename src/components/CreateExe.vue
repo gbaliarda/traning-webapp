@@ -53,7 +53,7 @@ export default {
     closeMod: Function,
     editable: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   data() {

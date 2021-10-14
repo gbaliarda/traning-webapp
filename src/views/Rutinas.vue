@@ -20,7 +20,7 @@
     <div v-else>
       <Spinner />
     </div>
-    <ViewRoutineModal ref="modal" />
+    <ViewRoutineModal ref="modal" :editable="true" />
     <div v-if="copyMessage" class="copyMessage" @click="copyMessage = false">
       <p>Link de la rutina copiado al portapapeles</p>
     </div> 
@@ -32,6 +32,7 @@ import RoutineCard from "../components/RoutineCard.vue";
 import AddButton from "../components/micro-components/AddButton.vue";
 import ViewRoutineModal from "../components/ViewRoutineModal.vue";
 import Spinner from "../components/micro-components/Spinner.vue";
+import { mapActions, mapState } from "vuex";
 import { Api } from "../../api/api";
 
 export default {
@@ -52,11 +53,18 @@ export default {
   computed: {
     window() {
       return window;
-    }
+    },
+    ...mapState('security', {
+      $user: state => state.user,
+    })
   },
   methods: {
+    ...mapActions('security', {
+      $getCurrentUser: 'getCurrentUser',
+    }),
     async getRoutines() {
-      let url = `${Api.baseUrl}/routines`;
+      await this.$getCurrentUser();
+      let url = `${Api.baseUrl}/routines?size=1000&userId=${this.$user.id}`;
       try {
         const res = await Api.get(url, true);
         this.routines = res.content;

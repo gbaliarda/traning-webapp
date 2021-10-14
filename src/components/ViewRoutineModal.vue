@@ -18,12 +18,13 @@
           </div>
           <div class="exercises">
             <ExerciseCard class="ejercicioItem"
-              v-for="ex in cycleExercises(cycle.id)"
+              v-for="ex in cycleExercises(cycle)"
               :key="ex.order"
               :titulo="ex.name"
-              :grupo="ex.group"
+              :descanso="ex.descanso.toString()"
               :duration="getDuration(ex)"
               :id="ex.id"
+              :editable="editable"
               :getterEx="() => getRoutine(routine.id)"
             />
           </div>
@@ -32,9 +33,13 @@
           <button @click="$router.push(`editar-rutina/${routine.id}`)">
             Editar
           </button>
-          <button class="delete-button" @click="deleteRoutine">Eliminar</button>
+          <div @mouseenter="displayTooltip" @mouseleave="displayTooltip">
+            <button class="delete-button" @click="deleteRoutine">Eliminar</button>
+            <div v-if="!loading" :class="tooltip ? 'tooltip' : 'hidden'">Si elimina la rutina,<br> se perderá para siempre</div>
+          </div>
         </div>
       </div>
+      
       <Spinner :class="{ hidden: !loading }" />
     </div>
   </Modal>
@@ -53,6 +58,9 @@ export default {
     Modal,
     ExerciseCard,
   },
+  props: {
+    editable: { type: Boolean, default: false},
+  },
   data() {
     return {
       routine: null,
@@ -63,6 +71,7 @@ export default {
       },
       loading: true,
       modalOpen: false,
+      tooltip: false,
     };
   },
   props: {
@@ -72,6 +81,9 @@ export default {
       }
   },
   methods: {
+    displayTooltip() {
+      this.tooltip = !this.tooltip;
+    },
     async getRoutine(routineID) {
       this.loading = true;
       this.routine = null;
@@ -141,14 +153,15 @@ export default {
       this.close();
       this.$router.go();
     },
-    cycleExercises(cycleID) {
-      let exercises = this.exercises.filter((e) => e.cycleID === cycleID);
+    cycleExercises(cycle) {
+      let exercises = this.exercises.filter((e) => e.cycleID === cycle.id);
       exercises = exercises.map((e) => ({
         name: e.exercise.name,
         group: e.exercise.metadata.grupo,
         difficulty: e.exercise.metadata.dif,
         order: e.order,
         duration: e.duration,
+        descanso: cycle.metadata.descansos[e.order-1],
         repetitions: e.repetitions,
         id: e.exercise.id,
       }));
@@ -303,5 +316,28 @@ export default {
   button {
     margin: 0;
   }
+
+  .tooltip {
+      position: absolute;
+      right: 17px;
+      bottom: 110px;
+      background: tomato;
+      color: #fff;
+      text-align: center;
+      padding: 1em;
+      border-radius: 10px;
+      pointer-events: none;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 10px;
+        border-style: solid;
+        border-color: tomato transparent transparent transparent;
+      }
+    }
 }
 </style>

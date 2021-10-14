@@ -3,12 +3,13 @@
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
       <p v-if="grupo">Grupo: {{ grupo }}</p>
+      <p v-if="descanso">Descanso: {{ descanso }} segundos</p>
       <p v-if="dificultad">Dificultad: {{ dificultad }}</p>
       <p v-if="duration">{{ duration }}</p>
     </div>
     <button @click="openModal">Detalles</button>
     <Modal title="Detalles" :open="modalOpen" :closeMod="closeMod">
-      <CreateExe :id="id" :closeMod="closeMod" :getterEx="getterEx" />
+      <CreateExe :id="id" :closeMod="closeMod" :getterEx="getterEx" :editable="editable" />
     </Modal>
   </div>
 </template>
@@ -35,6 +36,11 @@ export default {
     id: Number,
     getterEx: Function,
     duration: String,
+    descanso: String,
+    editable: {
+      type: Boolean,
+      default: false
+    }
   },
   methods: {
     openModal() {

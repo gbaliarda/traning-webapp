@@ -2,17 +2,19 @@
   <div class="ejercicio" :style="cssVars">
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
-      <div class="select-relative-container">
-        <select v-model="inputType">
-          <option value="repetitions">Repeticiones</option>
-          <option value="seconds">Segundos</option>
-          <option value="minutes">Minutos </option>
-        </select>
-        <div class="select-arrow"/>
+      <div class="duracionContainer">
+        <div class="select-relative-container">
+          <select v-model="inputType">
+            <option value="repetitions">Repeticiones</option>
+            <option value="seconds">Segundos</option>
+            <option value="minutes">Minutos </option>
+          </select>
+          <div class="select-arrow"/>
+        </div>
+        
+        <NumInput v-if="inputType == 'minutes'" :max="15" class="num-input-root" v-model="numInput"/>
+        <NumInput v-else class="num-input-root" v-model="numInput"/>
       </div>
-      
-      <NumInput v-if="inputType == 'minutes'" :max="15" class="num-input-root" v-model="numInput"/>
-      <NumInput v-else class="num-input-root" v-model="numInput"/>
       <div class="descanso-container">
         <span style="margin-left: .11em">Descanso</span>
         <div style="margin-right: .35em">
@@ -63,7 +65,7 @@ export default {
       initialized: false,
       numInput: 1,
       inputType: "repetitions",
-      modalOpen: false
+      modalOpen: false,
       descanso: 0,
     }
   },
@@ -146,6 +148,9 @@ export default {
     .card-title {
       font-size: 1.4em;
       text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .buttons {
@@ -165,10 +170,16 @@ export default {
         color: #DA611B;
       }
     }
-    .descripcion {
+
+    .duracionContainer {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      margin-bottom: .5em;
+    }
+
+    .descripcion {
+      
 
       select {
         height: 100%;
@@ -177,6 +188,7 @@ export default {
         border-radius: 10px;
         padding-right: 25px;
         padding-left: 5px;
+        cursor: pointer;
       }
       
       .num-input-root {

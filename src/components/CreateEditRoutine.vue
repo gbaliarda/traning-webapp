@@ -30,7 +30,7 @@
         </div>
         <div class="input">
           <p>Duración (minutos)</p>
-          <input v-model="duration" type="number" min="0">
+          <NumInput class="duration-input" v-model="duration" :min="0"/>
         </div>
       </div>
       <RoutineCycle ref="cicloCalentamiento" title="Ciclo Calentamiento" />
@@ -62,6 +62,7 @@ import { Api } from "../../api/api";
 import AddButton from "../components/micro-components/AddButton.vue";
 import RoutineCycle from "../components/RoutineCycle.vue";
 import Modal from "../components/Modal.vue";
+import NumInput from "../components/micro-components/NumInput.vue";
 import Spinner from "../components/micro-components/Spinner.vue";
 
 export default {
@@ -71,6 +72,7 @@ export default {
     AddButton,
     RoutineCycle,
     Modal,
+    NumInput,
     Spinner,
   },
   props: {
@@ -222,7 +224,7 @@ export default {
             const res = await Api.post(url, true, {
               order: index + 1,
               repetitions: exercise.repetitions,
-              duration: 0,
+              duration: exercise.duration,
             });
             this.error = false;
           } catch (e) {
@@ -307,6 +309,7 @@ export default {
           .map((e) => {
             let newEx = e.exercise;
             newEx.repetitions = e.repetitions;
+            newEx.duration = e.duration;
             return newEx;
           });
 
@@ -424,6 +427,10 @@ export default {
     .inputDificultad {
       position: relative;
     }
+  }
+
+  .duration-input {
+    width: 100%;
   }
   
   .bottomInputs {

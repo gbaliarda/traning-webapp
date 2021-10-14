@@ -2,7 +2,17 @@
   <div class="ejercicio" :style="cssVars">
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
-      <NumInput v-model="repetitions" text="Repeticiones" />
+      <div class="select-relative-container">
+        <select v-model="inputType">
+          <option value="repetitions">Repeticiones</option>
+          <option value="seconds">Segundos</option>
+          <option value="minutes">Minutos </option>
+        </select>
+        <div class="select-arrow"/>
+      </div>
+      
+      <NumInput v-if="inputType == 'minutes'" :max="15" class="num-input-root" v-model="numInput"/>
+      <NumInput v-else class="num-input-root" v-model="numInput"/>
       <div class="descanso-container">
         <span style="margin-left: .11em">Descanso</span>
         <div style="margin-right: .35em">
@@ -45,13 +55,15 @@ export default {
       default: "2em"
     },
     startRepetitions: Number,
+    startDuration: Number,
     startDescanso: String,
   },
   data() {
     return {
       initialized: false,
-      repetitions: 1,
-      modalOpen: false,
+      numInput: 1,
+      inputType: "repetitions",
+      modalOpen: false
       descanso: 0,
     }
   },
@@ -61,6 +73,15 @@ export default {
         '--margin-right': this.marginRight,
         '--margin-bottom': this.marginBottom
       }
+    },
+    duration() {
+      if(this.inputType == "minutes") return this.numInput * 60;
+      else if(this.inputType == "seconds") return this.numInput;
+      else return 0;
+    },
+    repetitions() {
+      if(this.inputType == "repetitions") return this.numInput;
+      else return 0;
     }
   },
   methods: {
@@ -72,10 +93,27 @@ export default {
     }
   },
   created() {
-    if(this.initialized || !this.startRepetitions) return;
+    if(this.initialized) return;
 
-    this.repetitions = this.startRepetitions;
-    this.descanso = this.startDescanso;
+    if(this.startRepetitions) {
+      this.numInput = this.startRepetitions;
+      this.inputType = "repetitions";
+    }
+      
+    if(this.startDuration) {
+      if(this.startDuration < 60){
+        this.inputType = "seconds";
+        this.numInput = this.startDuration;
+      }
+      else {
+        this.inputType = "minutes"
+        this.numInput = Math.floor(this.startDuration / 60);
+      }
+    }
+    
+    if(this.startDescanso)
+        this.descanso = this.startDescanso;
+        
     this.initialized = true;
   }
 };
@@ -127,7 +165,41 @@ export default {
         color: #DA611B;
       }
     }
+    .descripcion {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
 
+      select {
+        height: 100%;
+        width: 100%;
+        outline: 1px solid #bfbfbf;
+        border-radius: 10px;
+        padding-right: 25px;
+        padding-left: 5px;
+      }
+      
+      .num-input-root {
+        width: 50px;
+      }
+    }
+  }
+
+  .select-relative-container {
+    position: relative;
+  }
+
+  .select-arrow {
+    width: 0; 
+    height: 0; 
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    position: absolute;
+    right: 65px;
+    pointer-events: none;
+    border-top: 10px solid #EA8D59;
+    top: 40%;
+    right: 5%;
   }
 
   /* Chrome, Safari, Edge, Opera */

@@ -9,7 +9,7 @@
         :key="routine.id"
         :titulo="routine.name"
         :dificultad="routine.difficulty"
-        :duracion="routine.metadata.duration"
+        :duracion="routine.metadata.duration.toString()"
         @details="openModal(routine.id)"
         @share="copyToClipboard(`${window.location.host}/ver-rutina/${routine.id}`)"
       />

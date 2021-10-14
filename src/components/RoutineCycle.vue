@@ -16,6 +16,7 @@
               :id="ex.id"
               :titulo="ex.name"
               :startRepetitions="ex.repetitions"
+              :startDuration="ex.duration"
               :startDescanso="descansos[index]"
               @delete="() => deleteEx(ex, index)"
             />
@@ -66,8 +67,8 @@ export default {
       apiExercises() {
         return this.selectedEx.map((ex, index) => ({
           id: ex.id,
-          duration: 0,
-          repetitions: this.$refs.exercise[index].repetitions,
+          duration: this.$refs.exercise[index].duration,
+          repetitions: this.$refs.exercise[index].repetitions
           descanso: this.$refs.exercise[index].descanso,
         }))
       }
@@ -162,10 +163,10 @@ export default {
     }
 
     .input {
-      padding-top: 4px;
+      margin-top: 4px;
       margin-left: 24px;
       margin-right: 24px;
-      width: 150px;
+      width: 180px;
     }
 
     .icon {

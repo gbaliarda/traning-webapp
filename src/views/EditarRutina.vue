@@ -1,14 +1,17 @@
 <template>
-  <CreateEditRoutine :editing="false" />
+  <CreateEditRoutine :editing="true" :id="id" />
 </template>
 
 <script>
 import CreateEditRoutine from "../components/CreateEditRoutine.vue"
 
 export default {
-  name: "CrearRutina",
+  name: "EditarRutina",
   components: {
     CreateEditRoutine
+  },
+  props: {
+    id: String,
   }
 };
 </script>

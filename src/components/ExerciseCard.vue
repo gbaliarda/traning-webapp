@@ -2,21 +2,54 @@
   <div class="ejercicio">
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
-      <p>Grupo: {{ grupo }}</p>
-      <p>Dificultad: {{ dificultad }}</p>
+      <p v-if="grupo">Grupo: {{ grupo }}</p>
+      <p v-if="descanso">Descanso: {{ descanso }} segundos</p>
+      <p v-if="dificultad">Dificultad: {{ dificultad }}</p>
+      <p v-if="duration">{{ duration }}</p>
     </div>
-    <button>Detalles</button>
+    <button @click="openModal">Detalles</button>
+    <Modal title="Detalles" :open="modalOpen" :closeMod="closeMod">
+      <CreateExe :id="id" :closeMod="closeMod" :getterEx="getterEx" :editable="editable" />
+    </Modal>
   </div>
 </template>
 
 <script>
+import Modal from "./Modal.vue"
+import CreateExe from "./CreateExe.vue"
+
 export default {
   name: "ExerciseCard",
+  components: {
+    Modal,
+    CreateExe,
+  },
+  data() {
+    return {
+      modalOpen: false
+    }
+  },
   props: {
     titulo: String,
     grupo: String,
     dificultad: String,
-  }
+    id: Number,
+    getterEx: Function,
+    duration: String,
+    descanso: String,
+    editable: {
+      type: Boolean,
+      default: false
+    }
+  },
+  methods: {
+    openModal() {
+      this.modalOpen = true;
+    },
+    closeMod() {
+      this.modalOpen = false;
+    }
+  },
 };
 </script>
 
@@ -27,6 +60,7 @@ export default {
     height: 250px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     justify-content: space-between;
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;

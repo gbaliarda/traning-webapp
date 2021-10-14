@@ -7,11 +7,34 @@
 
 <script>
 import Navbar from './components/Navbar.vue';
+import {mapState, mapGetters} from 'vuex'
 
 export default {
   name: "App",
   components: {
     Navbar,
+  },
+  data() {
+    return {
+      result: null,
+    }
+  },
+  computed: {
+    ...mapState('security', {
+      $user: state => state.user,
+    }),
+    ...mapGetters('security', {
+      $isLoggedIn: 'isLoggedIn'
+    }),
+    canCreate() {
+      return this.$isLoggedIn && !this.sport
+    },
+    canOperate() {
+      return this.$isLoggedIn && this.sport
+    },
+    canAbort() {
+      return this.$isLoggedIn && this.controller
+    }
   },
 };
 
@@ -34,16 +57,21 @@ export default {
     scroll-behavior: smooth;
   }
 
-  html::-webkit-scrollbar {
+  *::-webkit-scrollbar {
       width: 10px;
   }
-  
+
   html::-webkit-scrollbar-track {
       border-radius: 150px;
       background: white;
   }
+
+  *:not(html, body)::-webkit-scrollbar-track {
+      border-radius: 150px;
+      background: #00000020;
+  }
   
-  html::-webkit-scrollbar-thumb {
+  *::-webkit-scrollbar-thumb {
       background:#DA611B;
       border-radius: 150px;
   }

@@ -65,22 +65,32 @@ export default {
   mounted: function() {
     document.getElementById("register").addEventListener("click", function(e) {
       document.querySelector(".signup").style.display = "flex";
+      setTimeout(() => document.querySelector(".signup").style.opacity = 1, 5);
     });
 
     document.getElementById("loginBtn").addEventListener("click", function(e) {
       document.querySelector(".login").style.display = "flex";
+      setTimeout(() => document.querySelector(".login").style.opacity = 1, 5);
     });
 
     document.getElementById("loginToRegister").addEventListener("click", function(e) {
       e.preventDefault();
+      console.log("hola");
       document.querySelector(".signup").style.display = "flex";
-      document.querySelector(".login").style.display = "none";
+      setTimeout(() => document.querySelector(".signup").style.opacity = 1, 5);
+      
+      document.querySelector(".login").style.opacity = 0;
+      setTimeout(() => document.querySelector(".login").style.display = "none", 250);
     });
 
     document.getElementById("registerToLogin").addEventListener("click", function(e) {
       e.preventDefault();
-      document.querySelector(".signup").style.display = "none";
+      console.log("hola");
       document.querySelector(".login").style.display = "flex";
+      setTimeout(() => document.querySelector(".login").style.opacity = 1, 5);
+
+      document.querySelector(".signup").style.opacity = 0;
+      setTimeout(() => document.querySelector(".signup").style.display = "none", 250);
     });
   }
 };

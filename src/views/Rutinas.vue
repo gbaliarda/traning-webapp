@@ -21,7 +21,7 @@
       <Spinner />
     </div>
     <ViewRoutineModal ref="modal" :editable="true" />
-    <div v-if="copyMessage" class="copyMessage" @click="copyMessage = false">
+    <div :class="['copyMessage', copyMessage ? 'copy-message-enabled' : undefined]" @click="copyMessage = false">
       <p>Link de la rutina copiado al portapapeles</p>
     </div> 
   </div>
@@ -150,13 +150,20 @@ export default {
 
   .copyMessage {
     position: fixed;
+    transition: opacity .2s, bottom .2s;
     background: #333;
     color: white;
     padding: 1em;
-    bottom: 20px;
+    bottom: 0px;
+    opacity: 0;
     left: 40%;
     border-radius: 10px;
     cursor: pointer;
+  }
+
+  .copy-message-enabled {
+    bottom: 20px;
+    opacity: 1;
   }
 }
 </style>

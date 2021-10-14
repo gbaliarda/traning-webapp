@@ -98,16 +98,18 @@ export default {
       password: '',
       loading: false,
       loadingVerify: false,
-      showVerifyMessage: false,
+      showVerifyMessage: false
     }
   },
   mounted: function() {
     document.querySelector(".background").addEventListener("click", () => {
-      document.querySelector(".signup").style.display = "none";
+      document.querySelector(".signup").style.opacity = 0;
+      setTimeout(() => document.querySelector(".signup").style.display = "none", 250);
     })
 
     document.querySelector(".signup .closeBtn").addEventListener("click", () => {
-      document.querySelector(".signup").style.display = "none";
+      document.querySelector(".signup").style.opacity = 0;
+      setTimeout(() => document.querySelector(".signup").style.display = "none", 250);
     })
   },
   methods: {
@@ -278,7 +280,7 @@ export default {
   .signup {
     display:none;
     position: fixed; 
-    transition: 200ms ease-in-out;
+    transition: opacity .25s ease-in-out;
     width: 100%;
     height: 100%;
     top: 0;
@@ -286,6 +288,7 @@ export default {
     align-items: center;
     text-align: center;
     z-index: 2;
+    opacity: 0;
 
     .registerBtnBox {
       display: flex;
@@ -359,6 +362,7 @@ export default {
     }
 
     .background {
+      transition: opacity .25s;
       background-color: rgba(0, 0, 0, 0.6);
       width: 100%;
       height: 100%;

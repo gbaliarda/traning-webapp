@@ -82,11 +82,13 @@ export default {
   },
   mounted: function() {
     document.querySelector(".loginBackground").addEventListener("click", () => {
-      document.querySelector(".login").style.display = "none";
+      document.querySelector(".login").style.opacity = 0;
+      setTimeout(() => document.querySelector(".login").style.display = "none", 250);
     })
 
     document.querySelector(".login .closeBtn").addEventListener("click", () => {
-      document.querySelector(".login").style.display = "none";
+      document.querySelector(".login").style.opacity = 0;
+      setTimeout(() => document.querySelector(".login").style.display = "none", 250);
     })
   },
   methods: {
@@ -212,7 +214,7 @@ export default {
   .login {
     display: none;
     position: fixed; 
-    transition: 200ms ease-in-out;
+    transition: opacity .25s;
     width: 100%;
     height: 100%;
     top: 0;
@@ -220,6 +222,7 @@ export default {
     align-items: center;
     text-align: center;
     z-index: 2;
+    opacity: 0;
 
     .registerBtnBox {
       display: flex;

@@ -199,6 +199,7 @@ export default {
   padding-left: 20px;
   overflow-y: scroll;
   scroll-behavior: smooth;
+  transition: width .5s, height .5s;
 
   .cycle {
     display: flex;

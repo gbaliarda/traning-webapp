@@ -7,8 +7,9 @@
       <div v-if="!loading && routine" class="rutina">
         <h1>{{ routine.name }}</h1>
         <div class="descripcion">
-          <p>Detalles: {{ routine.detail }}</p>
+          <p>Duracion: {{ routine.metadata.duration }} minutos</p>
           <p>Dificultad: {{ routine.difficulty }}</p>
+          <p>Detalles: {{ routine.detail }}</p>
         </div>
         <div class="cycle" v-for="cycle in cycles" :key="cycle.id">
           <div class="cycle-row">
@@ -16,7 +17,7 @@
             <p class="repetitions">Repeticiones: {{ cycle.repetitions }}</p>
           </div>
           <div class="exercises">
-            <ExerciseCard
+            <ExerciseCard class="ejercicioItem"
               v-for="ex in cycleExercises(cycle.id)"
               :key="ex.order"
               :titulo="ex.name"
@@ -178,8 +179,8 @@ export default {
 
 <style scoped lang="scss">
 .container {
-  max-height: 80vh;
-  max-width: 90vw;
+  max-height: 70vh;
+  width: 44vw;
   margin: auto;
   padding-right: 20px;
   padding-left: 20px;
@@ -192,7 +193,7 @@ export default {
     outline: #bfbfbf solid 1px;
     border-radius: 10px;
     padding-top: 18px;
-    padding-left: 32px;
+    padding-bottom: 26px;
     margin-bottom: 48px;
     width: 100%;
 
@@ -206,6 +207,7 @@ export default {
     p {
       font-size: 1.4em;
       margin-bottom: 1em;
+      padding-left: 32px;
     }
 
     .repetitions {
@@ -214,9 +216,14 @@ export default {
     }
 
     .exercises {
-      display: flex;
-      flex-direction: row;
-      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      place-items: center;
+      row-gap: 40px;
+
+      .ejercicioItem {
+        margin: auto;
+      }
     }
   }
 
@@ -254,9 +261,10 @@ export default {
   }
 
   .descripcion {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 1em;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 10px;
+    margin-bottom: 3em;
 
     p {
       margin-right: 120px;
@@ -288,16 +296,6 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  flex-grow: 1;
-  padding: 0;
-  margin-bottom: 10px;
-
-  button {
-    margin: 0;
-  }
-}
-</style>
-y-content: space-between;
   flex-grow: 1;
   padding: 0;
   margin-bottom: 10px;

@@ -1,16 +1,16 @@
 <template>
   <div class="container">
     <p :class="error.description!='' ? 'error' : 'hidden'">{{ error.description }}</p>
-    <div v-if="notSelectedExercises.length > 0" class='ejercicios'>
-        <div v-for="ex in notSelectedExercises" :key="ex.id" class="ejercicio">
-            <p class="card-title">{{ ex.name }}</p>
-            <div class="descripcion">
-                <p>Grupo: {{ ex.metadata.grupo }}</p>
-                <p>Dificultad: {{ ex.metadata.dif }}</p>
-            </div>
-            <button @click="() => $emit('choose', ex)">Elegir</button>
-        </div>
-    </div>
+      <div v-if="notSelectedExercises.length > 0" class='ejercicios'>
+          <div v-for="ex in notSelectedExercises" :key="ex.id" class="ejercicio">
+              <p class="card-title">{{ ex.name }}</p>
+              <div class="descripcion">
+                  <p>Grupo: {{ ex.metadata.grupo }}</p>
+                  <p>Dificultad: {{ ex.metadata.dif }}</p>
+              </div>
+              <button @click="() => $emit('choose', ex)">Elegir</button>
+          </div>
+      </div>
     <div v-else style="text-align: center">
       <p>No hay ejercicios creados.</p>
       <br /><br />

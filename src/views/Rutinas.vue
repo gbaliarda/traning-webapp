@@ -3,7 +3,7 @@
     <div class="title">
       <h1>Mis rutinas</h1>
     </div>
-    <div class="rutinas">
+    <div v-if="!loading" class="rutinas">
       <RoutineCard
         v-for="routine in routines"
         :key="routine.id"
@@ -17,7 +17,13 @@
         <AddButton />
       </router-link>
     </div>
+    <div v-else>
+      <Spinner />
+    </div>
     <ViewRoutineModal ref="modal" />
+    <div v-if="copyMessage" class="copyMessage" @click="copyMessage = false">
+      <p>Link de la rutina copiado al portapapeles</p>
+    </div> 
   </div>
 </template>
 
@@ -25,6 +31,7 @@
 import RoutineCard from "../components/RoutineCard.vue";
 import AddButton from "../components/micro-components/AddButton.vue";
 import ViewRoutineModal from "../components/ViewRoutineModal.vue";
+import Spinner from "../components/micro-components/Spinner.vue";
 import { Api } from "../../api/api";
 
 export default {
@@ -33,10 +40,13 @@ export default {
     RoutineCard,
     AddButton,
     ViewRoutineModal,
+    Spinner,
   },
   data() {
     return {
       routines: [],
+      loading: false,
+      copyMessage: false,
     };
   },
   computed: {
@@ -65,6 +75,7 @@ export default {
         routine.difficulty = diffMap[routine.difficulty];
         return routine;
       });
+      this.loading = false;
     },
     openModal(routineID) {
       this.$refs.modal.open(routineID);
@@ -90,9 +101,12 @@ export default {
         document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
         document.getSelection().addRange(selected);   // Restore the original selection
       }
+      this.copyMessage = true;
+      setTimeout(() => this.copyMessage = false, 4000);
     }
   },
   mounted() {
+    this.loading = true;
     this.$nextTick(async () => {
       this.getRoutines();
     });
@@ -124,6 +138,17 @@ export default {
     display: flex; // quizas cambiar a grid
     flex-wrap: wrap;
     margin-top: 5em;
+  }
+
+  .copyMessage {
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 1em;
+    bottom: 20px;
+    left: 40%;
+    border-radius: 10px;
+    cursor: pointer;
   }
 }
 </style>

@@ -46,7 +46,12 @@
       <AddButton @click="newCycle" class="add-cycle-button" />
       <RoutineCycle ref="cicloEnfriamiento" title="Ciclo Enfriamiento" />
       <p v-if="error" :class="error ? 'error-msg' : 'hidden'">{{textError}}</p>
-      <Button @click="saveRoutine" text="Guardar" />
+      <div class="saveBtn">
+        <Button v-if="!loadingSave" @click="saveRoutine" text="Guardar" />
+        <div v-else class="loadingBtn">
+          <Spinner />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -58,6 +63,7 @@ import AddButton from "../components/micro-components/AddButton.vue";
 import RoutineCycle from "../components/RoutineCycle.vue";
 import Modal from "../components/Modal.vue";
 import NumInput from "../components/micro-components/NumInput.vue";
+import Spinner from "../components/micro-components/Spinner.vue";
 
 export default {
   name: "CreateEditRoutine",
@@ -66,7 +72,8 @@ export default {
     AddButton,
     RoutineCycle,
     Modal,
-    NumInput
+    NumInput,
+    Spinner,
   },
   props: {
     id: String,
@@ -85,6 +92,7 @@ export default {
       error: false,
       textError: '',
       duration: 0,
+      loadingSave: false,
     };
   },
   methods: {
@@ -185,6 +193,12 @@ export default {
       cycles.forEach(async (cycle) => {
         const url = `${Api.baseUrl}/routines/${routineID}/cycles`;
         let id;
+        const descansos = [];
+
+        cycle.exercises.forEach((exercise) => {
+          descansos.push(exercise.descanso);
+        });
+
         try {
           const res = await Api.post(url, true, {
             name: cycle.name,
@@ -192,6 +206,9 @@ export default {
             repetitions: cycle.repetitions,
             order: cycle.order,
             type: cycle.type,
+            metadata: {
+              descansos
+            },
           });
           id = res.id;
           this.error = false;
@@ -230,7 +247,7 @@ export default {
           type: "warmup",
           order: 1,
           repetitions: 1,
-          metadata: null,
+          metadata: {},
         },
         {
           name: "Ciclo 1",
@@ -238,7 +255,7 @@ export default {
           type: "exercise",
           order: 2,
           repetitions: 1,
-          metadata: null,
+          metadata: {},
         },
         {
           name: "Ciclo Enfriamiento",
@@ -246,7 +263,7 @@ export default {
           type: "cooldown",
           order: 4,
           repetitions: 1,
-          metadata: null,
+          metadata: {},
         },
       ];
       return;
@@ -269,6 +286,7 @@ export default {
     this.difficulty = routine.difficulty;
     this.name = routine.name;
     this.detail = routine.detail;
+    this.duration = routine.metadata.duration;
 
     //Ciclos
     url = `${Api.baseUrl}/routines/${this.id}/cycles`;
@@ -298,12 +316,15 @@ export default {
         if (index == 0) {
           this.$refs.cicloCalentamiento.selectedEx = exercises;
           this.$refs.cicloCalentamiento.repetitions = cycle.repetitions;
+          this.$refs.cicloCalentamiento.descansos = cycle.metadata.descansos;
         } else if (index == this.cycles.length - 1) {
           this.$refs.cicloEnfriamiento.selectedEx = exercises;
           this.$refs.cicloEnfriamiento.repetitions = cycle.repetitions;
+          this.$refs.cicloEnfriamiento.descansos = cycle.metadata.descansos;
         } else {
           this.$refs.cicloEjercicio[index - 1].selectedEx = exercises;
           this.$refs.cicloEjercicio[index - 1].repetitions = cycle.repetitions;
+          this.$refs.cicloEjercicio[index - 1].descansos = cycle.metadata.descansos;
         }
       } catch (e) {
         if (e.code == 99) this.error.description = "Error al cargar ejercicios";
@@ -321,6 +342,7 @@ export default {
   width: 80%;
   margin: auto;
   margin-top: 4em;
+  padding-bottom: 4em;
 
   .error-msg {
     color: tomato;
@@ -413,6 +435,19 @@ export default {
   
   .bottomInputs {
     margin-top: 0;
+  }
+
+  .saveBtn {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .loadingBtn {
+    border: 1px solid #DA611B;
+    position: relative;
+    height: 42px;
+    width: 88px;
+    border-radius: 10px;
   }
 }
 </style>

@@ -13,6 +13,13 @@
       
       <NumInput v-if="inputType == 'minutes'" :max="15" class="num-input-root" v-model="numInput"/>
       <NumInput v-else class="num-input-root" v-model="numInput"/>
+      <div class="descanso-container">
+        <span style="margin-left: .11em">Descanso</span>
+        <div style="margin-right: .35em">
+          <input type="number" min="0" v-model="descanso" />
+          s
+        </div>
+      </div>
     </div>
     <div class="buttons">
       <button @click="openModal">Detalles</button>
@@ -49,6 +56,7 @@ export default {
     },
     startRepetitions: Number,
     startDuration: Number,
+    startDescanso: String,
   },
   data() {
     return {
@@ -56,6 +64,7 @@ export default {
       numInput: 1,
       inputType: "repetitions",
       modalOpen: false
+      descanso: 0,
     }
   },
   computed: {
@@ -102,6 +111,9 @@ export default {
       }
     }
     
+    if(this.startDescanso)
+        this.descanso = this.startDescanso;
+        
     this.initialized = true;
   }
 };
@@ -120,6 +132,16 @@ export default {
     border-radius: 10px;
     margin-right: var(--margin-right);
     margin-bottom: var(--margin-bottom);
+
+    .descanso-container {
+      display: flex;
+      justify-content: space-between;
+
+      input {
+        text-align: right;
+        width: 40px;
+      }
+    }
 
     .card-title {
       font-size: 1.4em;
@@ -179,4 +201,16 @@ export default {
     top: 40%;
     right: 5%;
   }
+
+  /* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 </style>

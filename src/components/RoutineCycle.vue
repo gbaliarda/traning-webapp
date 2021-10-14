@@ -17,6 +17,7 @@
               :titulo="ex.name"
               :startRepetitions="ex.repetitions"
               :startDuration="ex.duration"
+              :startDescanso="descansos[index]"
               @delete="() => deleteEx(ex, index)"
             />
             <AddButton @click="modalOpen = true" class="add-button"/>
@@ -41,7 +42,8 @@ export default {
             repetitions: 1,
             notSelectedEx: [],
             selectedEx: [],
-            modalOpen: false
+            modalOpen: false,
+            descansos: [],
         }
     },
     components: {
@@ -67,6 +69,7 @@ export default {
           id: ex.id,
           duration: this.$refs.exercise[index].duration,
           repetitions: this.$refs.exercise[index].repetitions
+          descanso: this.$refs.exercise[index].descanso,
         }))
       }
     },

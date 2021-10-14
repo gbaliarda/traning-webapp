@@ -110,7 +110,7 @@ export default {
       this.routine.difficulty = diffMap[this.routine.difficulty];
 
       //Ciclos
-      url = `${Api.baseUrl}/routines/${routineID}/cycles`;
+      url = `${Api.baseUrl}/routines/${routineID}/cycles?size=999`;
       try {
         const res = await Api.get(url, true);
         this.cycles = res.content.sort((a, b) => a.order - b.order);
@@ -122,7 +122,7 @@ export default {
 
       //Ejercicios
       this.cycles.forEach(async (cycle) => {
-        url = `${Api.baseUrl}/cycles/${cycle.id}/exercises`;
+        url = `${Api.baseUrl}/cycles/${cycle.id}/exercises?size=999`;
         try {
           const res = await Api.get(url, true);
           res.content.forEach((ex) => {

@@ -149,7 +149,7 @@ export default {
   }
 
   .copyMessage {
-    position: absolute;
+    position: fixed;
     background: #333;
     color: white;
     padding: 1em;

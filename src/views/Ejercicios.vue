@@ -10,7 +10,7 @@
     </div>
     <Spinner :class="{'hidden': !loading}" />
     <Modal title="Crear ejercicio" :open="modalOpen" :closeMod="closeMod">
-      <CreateExe :getterEx="getExercises" :closeMod="closeMod" />
+      <CreateExe :getterEx="getExercises" :closeMod="closeMod" :editable="true" />
     </Modal>
   </div>
 </template>

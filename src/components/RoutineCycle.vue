@@ -17,7 +17,7 @@
               :titulo="ex.name"
               :startRepetitions="ex.repetitions"
               :startDuration="ex.duration"
-              :startDescanso="descansos[index]"
+              :startDescanso="descansos[index].toString()"
               @delete="() => deleteEx(ex, index)"
             />
             <AddButton @click="modalOpen = true" class="add-button"/>

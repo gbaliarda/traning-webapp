@@ -18,7 +18,7 @@
         <Herramienta text="Crea tus rutinas personalizadas" icon="mdi-pencil" />
       </div>
     </div>
-    <img src="../assets/waveHerramientas.svg" class="waveH" />
+    <img src="../assets/waveHerramientas.svg" class="waveH" alt="Wave" />
 
     <Footer />
   </div>

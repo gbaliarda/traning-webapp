@@ -55,6 +55,7 @@
       </div>
     </div>
     <div class="verifyEmail">
+      <v-icon class="goBackArrow" size="30" @click="goBackToSignup">mdi-arrow-left</v-icon>
       <h2 class="title">Verifica tu e-mail</h2>
       <hr>
       <input type="text" placeholder="Inserte el codigo" class="input" id="verifyCode" :class="{ 'error' : invalidEmailVerification()}" />
@@ -69,6 +70,9 @@
           <Spinner />
         </div>
       </div>
+      <div v-if="showVerifyMessage" class="showVerifyMessage" @click="showVerifyMessage = false">
+        <p>Codigo de verificacion reenviado</p>
+      </div> 
     </div>
     <div class="background"></div>
   </div>
@@ -94,6 +98,7 @@ export default {
       password: '',
       loading: false,
       loadingVerify: false,
+      showVerifyMessage: false,
     }
   },
   mounted: function() {
@@ -221,7 +226,8 @@ export default {
         this.$login({credentials, rememberMe: true });
         this.loadingVerify = false;
         this.clearResult();
-        this.$router.push('/rutinas');
+        if(this.$router.path != '/rutinas')
+          this.$router.push('/rutinas');
       } catch(e) {
         this.setResult(e);
         console.log(e);
@@ -233,11 +239,17 @@ export default {
         const url = `${Api.baseUrl}/users/resend_verification`;
         const data = {'email': this.email};
         const result = await Api.post(url ,false, data);
+        this.showVerifyMessage = true;
+        setTimeout(() => this.showVerifyMessage = false, 4000);
         this.clearResult();
       } catch(e) {
         this.setResult(e);
         console.log(e);
       }
+    },
+    goBackToSignup() {
+      document.querySelector('.signup-content').style.display = "block";
+      document.querySelector('.verifyEmail').style.display = "none";
     },
   },
   watch: {
@@ -467,5 +479,31 @@ export default {
       display: inline !important;
       text-align: left !important;
     }
+
+    .goBackArrow {
+      color: #da611b;
+      cursor: pointer;
+      position: absolute;
+      left: 3%;
+      top: 5%;
+      z-index: 11;
+    }
+
+    .showVerifyMessage {
+      position: fixed;
+      background: #333;
+      color: white;
+      padding: 1em;
+      bottom: 20px;
+      left: 40%;
+      border-radius: 10px;
+      cursor: pointer;
+    }
   }
+
+::-ms-reveal {
+    display: none !important;
+}
+
+
 </style>

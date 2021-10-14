@@ -57,7 +57,8 @@ export default {
     },
     async logout() {
       await this.$logout();
-      this.$router.push('/');
+      if(this.$router.path != '/')
+        this.$router.push('/');
       this.clearResult();
     }
   },

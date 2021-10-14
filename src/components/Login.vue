@@ -33,6 +33,7 @@
       </div>
     </div>
     <div class="verifyLoginEmail">
+      <v-icon class="goBackArrow" size="30" @click="goBackToLogin">mdi-arrow-left</v-icon>
       <h2 class="title">Verifica tu e-mail</h2>
       <hr>
       <input type="text" placeholder="Inserte el codigo" class="input" id="verifyLoginCode" :class="{ 'error' : invalidEmailVerification()}" /> 
@@ -47,6 +48,9 @@
           <Spinner />
         </div>
       </div>
+      <div v-if="showVerifyLoginMessage" class="showVerifyLoginMessage" @click="showVerifyLoginMessage = false">
+        <p>Codigo de verificacion reenviado</p>
+      </div> 
     </div>
     <div class="loginBackground"></div>
   </div>
@@ -73,6 +77,7 @@ export default {
       password: '',
       loading: false,
       loadingVerify: false,
+      showVerifyLoginMessage: false,
     }
   },
   mounted: function() {
@@ -123,20 +128,19 @@ export default {
         this.user = document.getElementById('loginUser').value;
         this.password = document.getElementById('loginPassword').value;
         const credentials = new Credentials(this.user, this.password);
-        console.log(credentials);
         this.loading = true;
         await this.$login({credentials, rememberMe: true });
         this.loading = false;
         this.clearResult();
         document.querySelector(".login").style.display = "none";
-        this.$router.push('/rutinas');
+        if(this.$router.path != '/rutinas')
+          this.$router.push('/rutinas');
       } catch (e) {
         this.setResult(e);
         if(e.code === 8 && e.details[0] === 'Email not verified') {
           document.querySelector('.login-content').style.display = "none";
           document.querySelector('.verifyLoginEmail').style.display = "block";
         }
-        console.log(e);
       }
       this.loading = false;
     },
@@ -170,14 +174,18 @@ export default {
       try {
         const url = `${Api.baseUrl}/users/resend_verification`;
         const data = {'email': this.user};
-        this.loadingVerify = true;
         const result = await Api.post(url ,false, data);
+        this.showVerifyLoginMessage = true;
+        setTimeout(() => this.showVerifyLoginMessage = false, 4000);
         this.clearResult();
       } catch(e) {
         this.setResult(e);
         console.log(e);
       }
-      this.loadingVerify = false;
+    },
+    goBackToLogin() {
+      document.querySelector('.login-content').style.display = "block";
+      document.querySelector('.verifyLoginEmail').style.display = "none";
     },
   },
   watch: {
@@ -425,5 +433,29 @@ export default {
       display: inline !important;
       text-align: left !important;
     }
+
+    .goBackArrow {
+      color: #da611b;
+      cursor: pointer;
+      position: absolute;
+      left: 3%;
+      top: 5%;
+      z-index: 11;
+    }
+
+    .showVerifyLoginMessage {
+      position: fixed;
+      background: #333;
+      color: white;
+      padding: 1em;
+      bottom: 20px;
+      left: 40%;
+      border-radius: 10px;
+      cursor: pointer;
+    }
   }
+
+  ::-ms-reveal {
+    display: none !important;
+}
 </style>

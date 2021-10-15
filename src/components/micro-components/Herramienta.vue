@@ -1,6 +1,6 @@
 <template>
     <div class="herramienta">
-      <v-icon class="icon" size="45">{{icon}}</v-icon>
+      <v-icon class="icon" size="52">{{icon}}</v-icon>
       <p>{{ text }}</p>
     </div>
 </template>
@@ -26,7 +26,7 @@
     }
 
     p {
-      font-size: 1.2em;
+      font-size: 1.5em;
       font-weight: 300;
     }
   }

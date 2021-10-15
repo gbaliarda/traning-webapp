@@ -2,13 +2,13 @@
   <div class="login" id="login">
     <div class="login-content" id="login-content">
       <v-icon class="closeBtn">mdi-close</v-icon>
-      <h2 class="title">Iniciar Sesion</h2>
+      <h2 class="title">Iniciar Sesión</h2>
       <hr class="loginBar">
 
       <div class="formContent">
         <input type="email" placeholder="Email*" class="input" id="loginUser" :class="{ 'error' : invalidUsername()}" />
         <div class="errorTextBox">
-          <p class="errorText" :class="{ 'showError' : invalidUsername()}">Usuario invalido</p>
+          <p class="errorText" :class="{ 'showError' : invalidUsername()}">Usuario inválido</p>
         </div>
         <div class="passwordBox">
           <input type="password" placeholder="Contraseña*" class="input" id="loginPassword" :class="{ 'error' : invalidPassword()}" />
@@ -17,30 +17,30 @@
             <v-icon class="passwordEyeBtn" id="loginEyeBox1_2">mdi-eye-off</v-icon>
           </div>
           <div class="errorTextBox">
-            <p class="errorText" :class="{ 'showError' : invalidPassword()}">Contraseña invalida</p>
+            <p class="errorText" :class="{ 'showError' : invalidPassword()}">Contraseña inválida</p>
           </div>
         </div>
         <a class="restrictionText">¿Olvidaste tu contraseña?</a>
 
         <div class="registerBtnBox">
-          <button v-if="!loading" @click="login()" class="loginBtn" >Iniciar Sesion</button>
+          <button v-if="!loading" @click="login()" class="loginBtn" >Iniciar Sesión</button>
           <div v-else class="loadingBtn">
             <Spinner />
           </div>
         </div>
-        <p class="loginText">No tienes una cuenta?<br>
+        <p class="loginText">¿No tienes una cuenta?<br>
         <button class="registerText" id="loginToRegister">Registrate</button> ahora</p>
       </div>
     </div>
     <div class="verifyLoginEmail">
       <v-icon class="goBackArrow" size="30" @click="goBackToLogin">mdi-arrow-left</v-icon>
-      <h2 class="title">Verifica tu e-mail</h2>
+      <h2 class="title">Verificá tu e-mail</h2>
       <hr>
       <input type="text" placeholder="Inserte el codigo" class="input" id="verifyLoginCode" :class="{ 'error' : invalidEmailVerification()}" /> 
       <div class="errorTextBox">
-        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
+        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El código es inválido</p>
       </div>
-      <p class="resendEmail" @click="resendLoginEmail()">Reenviar e-mail de verifiacion</p>
+      <p class="resendEmail" @click="resendLoginEmail()">Reenviar e-mail de verificación</p>
 
       <div class="registerBtnBox">
         <input v-if="!loadingVerify" type="button" value="Verificar" @click="verifyLoginEmail()" class="verifyBtn" />
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div v-if="showVerifyLoginMessage" class="showVerifyLoginMessage" @click="showVerifyLoginMessage = false">
-        <p>Codigo de verificacion reenviado</p>
+        <p>Código de verificación reenviado</p>
       </div> 
     </div>
     <div class="loginBackground"></div>

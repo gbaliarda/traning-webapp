@@ -13,9 +13,9 @@
           align="center"
         >
           <h2 id="info-title">Información Básica</h2>
-          <v-icon class="editIcon editProfileInfo" @click="editProfileInfo">mdi-pencil</v-icon>
-          <v-icon class="confirmEdit confirmProfileInfo" @click="confirmProfileInfo">mdi-check</v-icon>
-          <v-icon class="cancelEdit cancelProfileInfo" @click="cancelProfileInfo">mdi-close</v-icon>
+          <v-icon class="editIcon editProfileInfo" @click="editProfileInfo" size="32">mdi-pencil</v-icon>
+          <v-icon class="confirmEdit confirmProfileInfo" @click="confirmProfileInfo" size="32">mdi-check</v-icon>
+          <v-icon class="cancelEdit cancelProfileInfo" @click="cancelProfileInfo" size="32">mdi-close</v-icon>
         </div>
         <h3 class="info-item"><span class="infoTitle">Nombre:</span>
           <p class="infoName" id="infoName">{{result.firstName}}</p>
@@ -28,7 +28,7 @@
       </div>
     </div>
     <p v-if="!result" style="color: tomato; font-size: 1.2em">No se pudo cargar la información de perfil</p>
-    <div v-else>
+    <div v-else-if="loadingProfile">
       <Spinner />
     </div>
     <Modal title="Editar foto de perfil" :open="modalOpen" :closeMod="closeMod">
@@ -192,14 +192,23 @@ h3 {
   font-weight: 400;
 }
 
+h2 {
+  font-size: 32px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
 #editName, #editEmail{
   border: 1px solid #aaa;
-  border-radius: 7px;
-  padding-left: 2px;
+  border-radius: 10px;
+
   margin-left: -3px;
   margin-bottom: -1px;
   margin-top: -1px;
   display: none;
+  padding: 7px;
 }
 
 .success-msg {
@@ -238,6 +247,7 @@ h3 {
 }
 
 .infoName {
+  padding: 5px;
   display: inline;
 }
 
@@ -271,7 +281,12 @@ h3 {
 }
 
 .info-item {
-  margin-bottom: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  height: 60px;
 }
 
 #title {

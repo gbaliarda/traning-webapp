@@ -12,10 +12,10 @@
         </div>
         <input type="email" placeholder="Email*" class="input" id="signupEmail" :class="{ 'error' : invalidEmail()}"/>
         <div class="errorTextBox">
-          <p class="errorText" :class="{ 'showError' : invalidFormatEmail()}">El formato del email es invalido</p>
+          <p class="errorText" :class="{ 'showError' : invalidFormatEmail()}">El formato del e-mail es inválido</p>
         </div>
         <div class="errorTextBox">
-          <p class="errorText" :class="{ 'showError' : invalidUniqueEmail()}">El mail ya esta asociado a una cuenta</p>
+          <p class="errorText" :class="{ 'showError' : invalidUniqueEmail()}">El e-mail ya está asociado a una cuenta</p>
         </div>
         <div class="passwordBox">
           <input type="password" placeholder="Contraseña*" class="input" id="firstPassword" :class="{ 'error' : invalidPassword()}"/>
@@ -24,10 +24,10 @@
             <v-icon class="passwordEyeBtn" id="eyeBox1_2">mdi-eye-off</v-icon>
           </div>
           <div class="errorTextBox">
-            <p class="errorText" :class="{ 'showError' : invalidNullPassword()}">Contraseña no puede estar vacio</p>
+            <p class="errorText" :class="{ 'showError' : invalidNullPassword()}">La contraseña no puede estar vacía</p>
           </div>
           <div class="errorTextBox">
-            <p class="errorText" :class="{ 'showError' : invalidLengthPassword()}">La contraseña tiene que tener mas de 8 caracteres</p>
+            <p class="errorText" :class="{ 'showError' : invalidLengthPassword()}">La contraseña tiene que tener más de 8 caracteres</p>
           </div>
         </div>
         
@@ -51,18 +51,18 @@
         </div>
         
         <p class="loginText">¿Ya tienes una cuenta?<br>
-        <button class="loginBtn" id="registerToLogin">Inicie sesion</button> ahora</p>
+        <button class="loginBtn" id="registerToLogin">Inicie sesión</button> ahora</p>
       </div>
     </div>
     <div class="verifyEmail">
       <v-icon class="goBackArrow" size="30" @click="goBackToSignup">mdi-arrow-left</v-icon>
-      <h2 class="title">Verifica tu e-mail</h2>
+      <h2 class="title">Verificá tu e-mail</h2>
       <hr>
       <input type="text" placeholder="Inserte el codigo" class="input" id="verifyCode" :class="{ 'error' : invalidEmailVerification()}" />
       <div class="errorTextBox">
-        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El codigo es invalido</p>
+        <p class="errorText" :class="{ 'showError' : invalidEmailVerification()}">El código es inválido</p>
       </div>
-      <p class="resendEmail" @click="resendEmail()">Reenviar e-mail de verificacion</p>
+      <p class="resendEmail" @click="resendEmail()">Reenviar e-mail de verificación</p>
 
       <div class="registerBtnBox">
         <input v-if="!loadingVerify" type="button" value="Verificar" @click="verifyEmail()" class="verifyBtn" />
@@ -71,7 +71,7 @@
         </div>
       </div>
       <div v-if="showVerifyMessage" class="showVerifyMessage" @click="showVerifyMessage = false">
-        <p>Codigo de verificacion reenviado</p>
+        <p>Código de verificación reenviado</p>
       </div> 
     </div>
     <div class="background"></div>

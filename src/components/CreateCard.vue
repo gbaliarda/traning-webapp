@@ -16,10 +16,9 @@
         <NumInput v-else class="num-input-root" v-model="numInput"/>
       </div>
       <div class="descanso-container">
-        <span style="margin-left: .11em">Descanso</span>
+        <span style="margin-left: .11em; margin-top: 10px; margin-right: 50px; white-space: nowrap;">Descanso (s)</span>
         <div style="margin-right: .35em">
-          <input type="number" min="0" v-model="descanso" />
-          s
+          <NumInput v-model="descanso" />
         </div>
       </div>
     </div>

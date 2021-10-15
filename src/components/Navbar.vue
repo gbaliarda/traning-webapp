@@ -8,7 +8,7 @@
           <router-link to="/perfil">Perfil</router-link>
           <router-link to="/ejercicios">Ejercicios</router-link>
           <router-link to="/rutinas">Rutinas</router-link>
-          <button @click="logout()" id="logoutBtn">Cerrar Sesion</button>
+          <button @click="logout()" id="logoutBtn">Cerrar Sesión</button>
         </div>
         <div class="noLoggedInBtns" :hidden="$isLoggedIn">
           <button class="register" id="register">Registrarse</button>

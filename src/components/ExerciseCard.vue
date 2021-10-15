@@ -3,9 +3,9 @@
     <p class="card-title">{{ titulo }}</p>
     <div class="descripcion">
       <p v-if="grupo">Grupo: {{ grupo }}</p>
-      <p v-if="descanso">Descanso: {{ descanso }} segundos</p>
       <p v-if="dificultad">Dificultad: {{ dificultad }}</p>
       <p v-if="duration">{{ duration }}</p>
+      <p v-if="descanso">Descanso: {{ descanso }} segundos</p>
     </div>
     <button @click="openModal">Detalles</button>
     <Modal title="Detalles" :open="modalOpen" :closeMod="closeMod">

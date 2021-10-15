@@ -7,7 +7,7 @@
       <div v-if="!loading && routine" class="rutina">
         <h1>{{ routine.name }}</h1>
         <div class="descripcion">
-          <p>Duracion: {{ routine.metadata.duration }} minutos</p>
+          <p>Duración: {{ routine.metadata.duration }} minutos</p>
           <p>Dificultad: {{ routine.difficulty }}</p>
           <p>Detalles: {{ routine.detail }}</p>
         </div>

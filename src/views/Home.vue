@@ -2,7 +2,7 @@
   <div class="container">
     <div class="landing">
       <div class="left">
-        <h2 class="title">Crea tus rutinas de forma rápida y sencilla</h2>
+        <h2 class="title">Creá tus rutinas de forma rápida y sencilla</h2>
         <h3 class="subtitle">Brindamos la mejor interfaz de control de rutinas de Latinoamérica.</h3>
       </div>
       <div class="right">
@@ -13,9 +13,9 @@
     <div id="herramientas">
       <h3>Herramientas</h3>
       <div class="herr-cont">
-        <Herramienta text="Crea tus rutinas personalizadas" icon="mdi-pencil" />
-        <Herramienta text="Crea tus rutinas personalizadas" icon="mdi-pencil" />
-        <Herramienta text="Crea tus rutinas personalizadas" icon="mdi-pencil" />
+        <Herramienta text="Creá tus rutinas personalizadas" icon="mdi-pencil" />
+        <Herramienta text="Compartí tus rutinas con tus amigos" icon="mdi-account-multiple" />
+        <Herramienta text="Entrená con nuestra app" icon="mdi-weight-lifter" />
       </div>
     </div>
     <img src="../assets/waveHerramientas.svg" class="waveH" alt="Wave" />
